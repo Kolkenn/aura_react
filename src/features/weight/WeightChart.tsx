@@ -101,7 +101,7 @@ const WeightChart = ({ entries }: WeightChartProps) => {
           grid: { display: false },
           ticks: {
             color: "#888",
-            font: { size: 10 },
+            font: { size: 12 },
             maxTicksLimit: 6,
           },
         },
@@ -109,7 +109,7 @@ const WeightChart = ({ entries }: WeightChartProps) => {
           grid: { color: "rgba(100, 100, 100, 0.1)" },
           ticks: {
             color: "#888",
-            font: { size: 10 },
+            font: { size: 12 },
             callback: (value) => `${value}`,
           },
         },
@@ -135,21 +135,26 @@ const WeightChart = ({ entries }: WeightChartProps) => {
 
   return (
     <Card className="mt-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Header - Responsive layout for zoomed/accessibility modes */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-2">
           <Scale size={20} className="text-secondary" />
           <h3 className="font-semibold text-base-content">Weight Tracker</h3>
         </div>
 
-        {/* Timeframe Toggles */}
-        <div className="flex gap-1">
+        {/* Timeframe Toggles - Accessible touch targets */}
+        <div
+          className="flex flex-wrap gap-2"
+          role="group"
+          aria-label="Time period filter"
+        >
           {TIMEFRAMES.map(({ id, label }) => (
             <Chip
               key={id}
               active={timeframe === id}
               onClick={() => setTimeframe(id)}
-              className="badge-sm"
+              size="md"
+              aria-pressed={timeframe === id}
             >
               {label}
             </Chip>
