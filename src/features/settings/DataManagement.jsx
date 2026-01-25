@@ -105,7 +105,7 @@ const DataManagement = ({ onExport, onImport, onClear, entryCount }) => {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".json,application/json"
+            accept=".json,application/json,text/plain,text/*"
             onChange={handleFileChange}
             className="hidden"
           />

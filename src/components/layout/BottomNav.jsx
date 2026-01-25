@@ -11,7 +11,7 @@ const BottomNav = ({ activeView, onViewChange }) => {
   ];
 
   return (
-    <nav className="sticky bottom-0 z-40 glass-strong safe-bottom">
+    <nav className="sticky bottom-0 z-40 glass-strong">
       <div className="flex items-center justify-around py-1 px-2">
         {navItems.map(({ id, label, icon: Icon }) => {
           const isActive = activeView === id;
