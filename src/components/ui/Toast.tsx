@@ -84,29 +84,17 @@ const Toast = ({
     }
   };
 
-  const getIconColor = (): string => {
+  // Map toast types to DaisyUI alert classes
+  const getAlertClass = () => {
     switch (type) {
       case "success":
-        return "text-green-500";
-      case "update":
-        return "text-pink-500";
+        return "alert-success";
       case "error":
-        return "text-amber-500";
-      default:
-        return "text-blue-500";
-    }
-  };
-
-  const getProgressColor = (): string => {
-    switch (type) {
-      case "success":
-        return "bg-green-500";
+        return "alert-error";
       case "update":
-        return "bg-pink-500";
-      case "error":
-        return "bg-amber-500";
+        return "alert-info"; // using info for updates
       default:
-        return "bg-blue-500";
+        return "alert-info";
     }
   };
 
@@ -115,39 +103,35 @@ const Toast = ({
   return (
     <div
       className={`
-        glass-strong rounded-xl overflow-hidden shadow-lg
+        alert ${getAlertClass()} shadow-lg
         transform transition-all duration-200
         ${isExiting ? "opacity-0 translate-x-full" : "opacity-100 translate-x-0"}
+        flex items-center gap-2
       `}
     >
-      <div className="p-4 flex items-center gap-3">
-        <Icon size={20} className={getIconColor()} />
-        <span className="text-sm text-white flex-1">{message}</span>
+      <Icon size={20} />
+      <span className="flex-1 text-sm">{message}</span>
 
-        <div className="flex items-center gap-2">
-          {action && (
-            <button
-              onClick={action}
-              className="px-3 py-1.5 text-sm font-medium text-white bg-pink-500 hover:bg-pink-600 rounded-lg transition-colors"
-            >
-              {actionLabel}
-            </button>
-          )}
-          <button
-            onClick={handleDismiss}
-            className="p-1 hover:bg-white/10 rounded-lg transition-colors"
-            aria-label="Dismiss"
-          >
-            <X size={16} className="text-gray-400" />
+      <div className="flex gap-2">
+        {action && (
+          <button onClick={action} className="btn btn-xs btn-primary">
+            {actionLabel}
           </button>
-        </div>
+        )}
+        <button
+          onClick={handleDismiss}
+          className="btn btn-xs btn-ghost btn-circle"
+          aria-label="Dismiss"
+        >
+          <X size={16} />
+        </button>
       </div>
 
       {/* Auto-dismiss progress bar */}
       {autoDismiss && (
-        <div className="h-1 bg-white/10">
+        <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/10">
           <div
-            className={`h-full ${getProgressColor()} transition-all duration-100 ease-linear`}
+            className="h-full bg-black/20 transition-all duration-100 ease-linear"
             style={{ width: `${progress}%` }}
           />
         </div>

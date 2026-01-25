@@ -23,34 +23,21 @@ const BottomNav = ({ activeView, onViewChange }: BottomNavProps) => {
   ];
 
   return (
-    <nav className="sticky bottom-0 z-40 glass-strong">
-      <div className="flex items-center justify-around py-1 px-2">
-        {navItems.map(({ id, label, icon: Icon }) => {
-          const isActive = activeView === id;
-          return (
-            <button
-              key={id}
-              onClick={() => onViewChange(id)}
-              className={`flex flex-col items-center gap-1 py-2 px-4 rounded-xl transition-all duration-200 min-w-[70px] ${
-                isActive
-                  ? "text-(--color-primary) bg-(--bg-tertiary)"
-                  : "text-(--text-muted) hover:text-(--text-secondary)"
-              }`}
-              aria-current={isActive ? "page" : undefined}
-            >
-              <Icon
-                size={22}
-                strokeWidth={isActive ? 2.5 : 2}
-                className={
-                  isActive ? "drop-shadow-[0_0_8px_var(--color-primary)]" : ""
-                }
-              />
-              <span className="text-xs font-medium">{label}</span>
-            </button>
-          );
-        })}
-      </div>
-    </nav>
+    <div className="dock">
+      {navItems.map(({ id, label, icon: Icon }) => {
+        const isActive = activeView === id;
+        return (
+          <button
+            key={id}
+            onClick={() => onViewChange(id)}
+            className={`${isActive ? "active text-primary bg-primary/10" : "text-base-content/60 hover:text-base-content"} flex flex-col items-center justify-center gap-1 p-2`}
+          >
+            <Icon size={22} strokeWidth={isActive ? 2.5 : 1.5} />
+            <span className="dock-label text-xs font-medium">{label}</span>
+          </button>
+        );
+      })}
+    </div>
   );
 };
 

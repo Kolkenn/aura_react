@@ -55,25 +55,18 @@ const Modal = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ backgroundColor: "rgba(0, 0, 0, 0.7)" }}
-      onClick={onClose}
-    >
+    <div className={`modal ${isOpen ? "modal-open" : ""}`} role="dialog">
       <div
-        className={`glass-strong rounded-2xl w-full ${sizeClasses[size]} animate-slide-up max-h-[90vh] overflow-hidden flex flex-col`}
-        onClick={(e) => e.stopPropagation()}
+        className={`modal-box ${sizeClasses[size] || "max-w-md"} relative flex flex-col max-h-[90vh] p-0`}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-5 border-b border-(border-color)">
-            {title && (
-              <h2 className="text-lg font-semibold gradient-text">{title}</h2>
-            )}
+          <div className="flex items-center justify-between p-5 border-b border-base-200">
+            {title && <h2 className="text-lg font-bold">{title}</h2>}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-1 rounded-lg hover:bg-(bg-tertiary) transition-colors text-(text-secondary)"
+                className="btn btn-sm btn-circle btn-ghost"
                 aria-label="Close modal"
               >
                 <X size={20} />
@@ -85,6 +78,9 @@ const Modal = ({
         {/* Content */}
         <div className="p-5 overflow-y-auto flex-1">{children}</div>
       </div>
+      <form method="dialog" className="modal-backdrop">
+        <button onClick={onClose}>close</button>
+      </form>
     </div>
   );
 };

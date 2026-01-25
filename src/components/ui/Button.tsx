@@ -27,14 +27,14 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     const variantClasses: Record<ButtonVariant, string> = {
       primary: "btn-primary",
       secondary: "btn-secondary",
-      danger: "btn-danger",
+      danger: "btn-error",
       ghost: "btn-ghost",
     };
 
     const sizeClasses: Record<ButtonSize, string> = {
-      sm: "text-xs py-2 px-3",
-      md: "text-sm py-3 px-4",
-      lg: "text-base py-4 px-6",
+      sm: "btn-sm",
+      md: "btn-md",
+      lg: "btn-lg",
     };
 
     return (

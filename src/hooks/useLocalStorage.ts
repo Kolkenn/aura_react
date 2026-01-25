@@ -13,7 +13,15 @@ const STORAGE_KEY = "cycle_tracker_mvp_data";
 const DEFAULT_DATA: StorageData = {
   userSettings: {
     averageCycleLength: 28,
-    flowOptions: ["None", "Spotting", "Light", "Medium", "Heavy"],
+    flowOptions: [
+      "None",
+      "Spotting",
+      "Light",
+      "Medium",
+      "Heavy",
+      "V. Heavy",
+      "Clotting",
+    ],
     moodOptions: [
       "Happy",
       "Calm",
@@ -23,6 +31,9 @@ const DEFAULT_DATA: StorageData = {
       "Energetic",
       "Tired",
       "Moody",
+      "Stressed",
+      "Anxious",
+      "Depressed",
     ],
     symptomOptions: [
       "Cramps",
@@ -35,6 +46,7 @@ const DEFAULT_DATA: StorageData = {
       "Acne",
       "Insomnia",
     ],
+    theme: "valentine",
   },
   entries: {},
 };

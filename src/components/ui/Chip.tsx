@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, ReactNode, CSSProperties } from "react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
 
 interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children?: ReactNode;
@@ -17,18 +17,17 @@ const Chip = ({
   color,
   ...props
 }: ChipProps) => {
-  const colorStyles: CSSProperties = color
-    ? {
-        background: active ? color : "var(--bg-tertiary)",
-        borderColor: active ? color : "var(--border-color)",
-      }
-    : {};
-
   return (
     <button
       type="button"
-      className={`chip ${active ? "active" : ""} ${className}`}
-      style={colorStyles}
+      className={`badge badge-lg gap-2 cursor-pointer transition-all ${
+        active
+          ? `badge-primary text-primary-content border-transparent`
+          : `badge-outline hover:border-primary hover:text-primary`
+      } ${className}`}
+      style={
+        color && active ? { backgroundColor: color, borderColor: color } : {}
+      }
       onClick={onClick}
       {...props}
     >

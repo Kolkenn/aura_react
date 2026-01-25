@@ -16,9 +16,11 @@ const Card = ({
   glow = false,
   ...props
 }: CardProps) => {
-  const baseClasses = "card";
+  const baseClasses =
+    "card bg-base-100 shadow-xl border border-base-content/10";
   const paddingClass = padding ? "p-5" : "p-0";
-  const glowClass = glow ? "glow-purple" : "";
+  // glow logic can be kept or mapped to a specific shadow class if needed
+  const glowClass = glow ? "shadow-2xl shadow-primary/20" : "";
 
   return (
     <div

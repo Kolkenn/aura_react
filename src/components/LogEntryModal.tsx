@@ -80,8 +80,8 @@ const LogEntryModal = ({
         {/* Weight Input */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Scale size={16} className="text-(--color-secondary)" />
-            <label className="text-sm font-medium text-(--text-primary)">
+            <Scale size={16} className="text-secondary" />
+            <label className="text-sm font-medium text-base-content">
               Weight
             </label>
           </div>
@@ -96,15 +96,15 @@ const LogEntryModal = ({
               placeholder="Enter weight..."
               className="flex-1"
             />
-            <span className="text-sm text-(--text-muted)">lbs</span>
+            <span className="text-sm text-base-content/60">lbs</span>
           </div>
         </div>
 
         {/* Flow Selection */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Droplet size={16} className="text-(--color-primary)" />
-            <label className="text-sm font-medium text-(--text-primary)">
+            <Droplet size={16} className="text-primary" />
+            <label className="text-sm font-medium text-base-content">
               Flow
             </label>
           </div>
@@ -114,6 +114,7 @@ const LogEntryModal = ({
                 key={option}
                 active={flow === option}
                 onClick={() => setFlow(option)}
+                className={flow === option ? "badge-primary" : ""}
               >
                 {option}
               </Chip>
@@ -124,12 +125,12 @@ const LogEntryModal = ({
         {/* Mood Selection */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Brain size={16} className="text-(--color-primary)" />
-            <label className="text-sm font-medium text-(--text-primary)">
+            <Brain size={16} className="text-warning" />
+            <label className="text-sm font-medium text-base-content">
               Mood
             </label>
             {selectedMoods.length > 0 && (
-              <span className="text-xs text-(--text-muted)">
+              <span className="text-xs text-base-content/60">
                 ({selectedMoods.length} selected)
               </span>
             )}
@@ -140,6 +141,7 @@ const LogEntryModal = ({
                 key={mood}
                 active={selectedMoods.includes(mood)}
                 onClick={() => handleMoodToggle(mood)}
+                className={selectedMoods.includes(mood) ? "badge-warning" : ""}
               >
                 {mood}
               </Chip>
@@ -150,12 +152,12 @@ const LogEntryModal = ({
         {/* Symptoms Selection */}
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <Activity size={16} className="text-(--color-primary)" />
-            <label className="text-sm font-medium text-(--text-primary)">
+            <Activity size={16} className="text-info" />
+            <label className="text-sm font-medium text-base-content">
               Symptoms
             </label>
             {selectedSymptoms.length > 0 && (
-              <span className="text-xs text-(--text-muted)">
+              <span className="text-xs text-base-content/60">
                 ({selectedSymptoms.length} selected)
               </span>
             )}
@@ -166,6 +168,9 @@ const LogEntryModal = ({
                 key={symptom}
                 active={selectedSymptoms.includes(symptom)}
                 onClick={() => handleSymptomToggle(symptom)}
+                className={
+                  selectedSymptoms.includes(symptom) ? "badge-info" : ""
+                }
               >
                 {symptom}
               </Chip>

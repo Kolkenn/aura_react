@@ -18,7 +18,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-(text-secondary) mb-2"
+            className="block text-sm font-medium text-base-content/70 mb-2"
           >
             {label}
           </label>
@@ -26,10 +26,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         <input
           ref={ref}
           id={inputId}
-          className={`input ${error ? "border-(color-danger)" : ""} ${className}`}
+          className={`input input-bordered w-full ${error ? "input-error" : ""} ${className}`}
           {...props}
         />
-        {error && <p className="mt-1 text-xs text-(color-danger)">{error}</p>}
+        {error && <p className="mt-1 text-xs text-error">{error}</p>}
       </div>
     );
   },

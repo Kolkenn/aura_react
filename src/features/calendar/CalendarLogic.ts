@@ -103,7 +103,10 @@ export function getEntryIndicators(entry?: Entry): EntryIndicators {
  */
 export function getFlowLevel(flow?: string): string | null {
   if (!flow || flow === "None") return null;
-  return flow.toLowerCase().replace(" ", "-");
+  return flow
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-") // Replace non-alphanumeric chars with hyphens
+    .replace(/^-+|-+$/g, ""); // Remove leading/trailing hyphens
 }
 
 export { format, isSameMonth, isSameDay, isToday };

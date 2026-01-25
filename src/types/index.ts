@@ -6,11 +6,11 @@
  * Entry data for a single day's log
  */
 export interface Entry {
-  flow?: string;
-  mood?: string[];
-  symptoms?: string[];
-  weight?: string;
-  notes?: string;
+  flow?: string; // Light, Medium, Heavy, Spotting
+  mood?: string[]; // Happy, Sad, Angry, Anxious, Tired, Energized
+  symptoms?: string[]; // PMS, Cramps, Mood swings, Fatigue, Headache, Acne, Insomnia
+  weight?: string; // 120 lbs
+  notes?: string; // Any additional notes
 }
 
 /**
@@ -22,10 +22,11 @@ export type EntriesMap = Record<string, Entry>;
  * User configurable settings
  */
 export interface UserSettings {
-  averageCycleLength: number;
-  flowOptions: string[];
-  moodOptions: string[];
-  symptomOptions: string[];
+  averageCycleLength: number; // 28 days
+  flowOptions: string[]; // Light, Medium, Heavy, Spotting
+  moodOptions: string[]; // Happy, Sad, Angry, Anxious, Tired, Energized
+  symptomOptions: string[]; // PMS, Cramps, Mood swings, Fatigue, Headache, Acne, Insomnia
+  theme: string; // valentine, synthwave, halloween, aqua, pastel, luxury, dracula
 }
 
 /**
@@ -85,40 +86,40 @@ export type ButtonSize = "sm" | "md" | "lg";
  * Return type for useLocalStorage hook
  */
 export interface UseLocalStorageReturn {
-  data: StorageData;
-  userSettings: UserSettings;
-  entries: EntriesMap;
-  getEntry: (dateKey: string) => Entry | null;
-  getAllEntries: () => EntriesMap;
-  saveEntry: (dateKey: string, entryData: Partial<Entry>) => void;
-  deleteEntry: (dateKey: string) => void;
-  updateSettings: (newSettings: Partial<UserSettings>) => void;
-  addCustomOption: (type: "mood" | "symptom", option: string) => void;
-  removeCustomOption: (type: "mood" | "symptom", option: string) => void;
-  exportData: () => void;
-  importData: (jsonData: string | object) => ImportResult;
-  clearAllData: () => void;
+  data: StorageData; // { userSettings: UserSettings; entries: EntriesMap; }
+  userSettings: UserSettings; // { averageCycleLength: number; flowOptions: string[]; moodOptions: string[]; symptomOptions: string[]; theme: string; }
+  entries: EntriesMap; // { [dateKey: string]: Entry; }
+  getEntry: (dateKey: string) => Entry | null; // Returns entry for a specific date
+  getAllEntries: () => EntriesMap; // Returns all entries
+  saveEntry: (dateKey: string, entryData: Partial<Entry>) => void; // Saves an entry for a specific date
+  deleteEntry: (dateKey: string) => void; // Deletes an entry for a specific date
+  updateSettings: (newSettings: Partial<UserSettings>) => void; // Updates user settings
+  addCustomOption: (type: "mood" | "symptom", option: string) => void; // Adds a custom option to the mood or symptom list
+  removeCustomOption: (type: "mood" | "symptom", option: string) => void; // Removes a custom option from the mood or symptom list
+  exportData: () => void; // Exports all data to a JSON file
+  importData: (jsonData: string | object) => ImportResult; // Imports data from a JSON file
+  clearAllData: () => void; // Clears all data
 }
 
 /**
  * Result of data import operation
  */
 export interface ImportResult {
-  success: boolean;
-  error?: string;
-  entryCount?: number;
+  success: boolean; // True if import was successful
+  error?: string; // Error message if import failed
+  entryCount?: number; // Number of entries imported
 }
 
 /**
  * Return type for usePWAUpdate hook
  */
 export interface UsePWAUpdateReturn {
-  offlineReady: boolean;
-  needRefresh: boolean;
-  isInstalled: boolean;
-  hasServiceWorker: boolean;
-  handleUpdate: () => void;
-  dismissToast: () => void;
+  offlineReady: boolean; // True if the app is ready to be installed
+  needRefresh: boolean; // True if the app needs to be refreshed
+  isInstalled: boolean; // True if the app is installed
+  hasServiceWorker: boolean; // True if the app has a service worker
+  handleUpdate: () => void; // Updates the app
+  dismissToast: () => void; // Dismisses the toast
   dismissOfflineReady: () => void;
 }
 
@@ -130,12 +131,12 @@ export interface UsePWAUpdateReturn {
  * Props that include children
  */
 export interface WithChildren {
-  children?: React.ReactNode;
+  children?: React.ReactNode; // React node(s) to render
 }
 
 /**
  * Props that include className
  */
 export interface WithClassName {
-  className?: string;
+  className?: string; // Tailwind CSS classes
 }

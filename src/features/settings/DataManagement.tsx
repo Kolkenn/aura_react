@@ -96,9 +96,7 @@ const DataManagement = ({
   return (
     <>
       <Card>
-        <h3 className="font-medium text-(--text-primary) mb-4">
-          Data Management
-        </h3>
+        <h3 className="font-medium text-base-content mb-4">Data Management</h3>
 
         <div className="space-y-3">
           {/* Export Button */}
@@ -139,7 +137,7 @@ const DataManagement = ({
           </Button>
 
           {/* Entry Count */}
-          <p className="text-xs text-(text-muted) text-center pt-2">
+          <p className="text-xs text-base-content/60 text-center pt-2">
             {entryCount} entries currently stored
           </p>
 
@@ -148,8 +146,8 @@ const DataManagement = ({
             <div
               className={`flex items-center gap-2 p-3 rounded-lg text-sm ${
                 importStatus.type === "success"
-                  ? "bg-(color-success)/20 text-(color-success)"
-                  : "bg-(color-danger)/20 text-(color-danger)"
+                  ? "alert alert-success"
+                  : "alert alert-error"
               }`}
             >
               {importStatus.type === "success" ? (
@@ -171,16 +169,14 @@ const DataManagement = ({
         size="sm"
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-(color-danger)/10">
-            <AlertTriangle size={24} className="text-(color-danger) shrink-0" />
+          <div className="alert alert-error">
+            <AlertTriangle size={24} className="shrink-0" />
             <div>
-              <p className="text-(text-primary) font-medium">
-                This action cannot be undone
-              </p>
-              <p className="text-sm text-(text-secondary) mt-1">
+              <h3 className="font-bold">This action cannot be undone</h3>
+              <div className="text-xs">
                 All your entries, settings, and history will be permanently
                 deleted.
-              </p>
+              </div>
             </div>
           </div>
 

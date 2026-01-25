@@ -24,13 +24,13 @@ const HistoryList = ({ entries, onEntryClick }: HistoryListProps) => {
   if (sortedEntries.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-16 h-16 rounded-full bg-(bg-tertiary) flex items-center justify-center mb-4">
-          <Clock size={28} className="text-(text-muted)" />
+        <div className="w-16 h-16 rounded-full bg-base-200 flex items-center justify-center mb-4">
+          <Clock size={28} className="text-base-content/40" />
         </div>
-        <h3 className="text-lg font-medium text-(text-secondary) mb-2">
+        <h3 className="text-lg font-medium text-base-content/70 mb-2">
           No entries yet
         </h3>
-        <p className="text-sm text-(text-muted) max-w-xs">
+        <p className="text-sm text-base-content/50 max-w-xs">
           Start tracking by tapping on any day in the calendar to log your first
           entry.
         </p>
@@ -43,16 +43,16 @@ const HistoryList = ({ entries, onEntryClick }: HistoryListProps) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Clock size={20} className="text-(color-secondary)" />
-          <h2 className="font-semibold text-(text-primary)">History</h2>
+          <Clock size={20} className="text-secondary" />
+          <h2 className="font-semibold text-base-content">History</h2>
         </div>
-        <span className="text-sm text-(text-muted)">
+        <span className="text-sm text-base-content/60">
           {sortedEntries.length} entr{sortedEntries.length === 1 ? "y" : "ies"}
         </span>
       </div>
 
       {/* Entry List */}
-      <div>
+      <div className="space-y-2">
         {sortedEntries.map(({ dateKey, entry }) => (
           <HistoryItem
             key={dateKey}

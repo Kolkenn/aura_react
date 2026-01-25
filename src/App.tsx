@@ -24,7 +24,7 @@ import { ConfigForm, DataManagement } from "./features/settings";
 import LogEntryModal from "./components/LogEntryModal";
 
 // App Version
-const APP_VERSION = "1.0.3";
+const APP_VERSION = "1.0.4";
 
 function App() {
   const [activeView, setActiveView] = useState<ViewType>("calendar");
@@ -57,8 +57,6 @@ function App() {
     clearAllData,
   } = useLocalStorage();
 
-  // Manage toasts based on PWA state
-  // Manage toasts based on PWA state
   useEffect(() => {
     if (offlineReady) {
       const id = "offline-ready";
@@ -107,6 +105,12 @@ function App() {
     }
   }, [needRefresh, handleUpdate]);
 
+  // Apply theme to html element
+  useEffect(() => {
+    const theme = userSettings.theme || "valentine";
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [userSettings.theme]);
+
   // Handle toast dismissal
   const handleDismissToast = (id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -147,7 +151,7 @@ function App() {
     switch (activeView) {
       case "calendar":
         return (
-          <div className="animate-fade-in">
+          <div className="">
             <CalendarGrid
               entries={entries}
               averageCycleLength={userSettings.averageCycleLength}
@@ -171,13 +175,17 @@ function App() {
             <Card>
               <div className="flex items-center gap-3 mb-4">
                 <div>
-                  <h2 className="font-semibold text-white">Aura</h2>
-                  <p className="text-sm text-gray-500">Version {APP_VERSION}</p>
+                  <h2 className="text-xl font-semibold text-base-content">
+                    Aura
+                  </h2>
+                  <p className="text-sm text-base-content/60">
+                    Version {APP_VERSION}
+                  </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-gray-400">App Status:</span>
+                <span className="text-base-content/60">App Status:</span>
                 {pwaStatus === "installed" ? (
                   <span className="flex items-center gap-1 text-green-500">
                     <CheckCircle size={14} />
@@ -196,8 +204,8 @@ function App() {
                 )}
               </div>
 
-              <div className="mt-3 pt-3 border-t border-gray-700">
-                <p className="text-xs text-gray-500">
+              <div className="mt-3 pt-3 border-t border-base-content/10">
+                <p className="text-xs text-base-content/60">
                   🔒 Your data is stored locally on this device. No data is sent
                   to any server.
                 </p>
@@ -228,27 +236,32 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Main Content */}
-      <main className="flex-1 overflow-y-auto px-3 py-3">{renderView()}</main>
+    <div className="min-h-screen flex justify-center bg-base-200">
+      {/* Desktop Container */}
+      <div className="flex flex-col min-h-screen w-full max-w-[768px] bg-base-100 shadow-xl">
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto px-3 py-3 pb-18">
+          {renderView()}
+        </main>
 
-      {/* Bottom Navigation */}
-      <BottomNav activeView={activeView} onViewChange={setActiveView} />
+        {/* Bottom Navigation */}
+        <BottomNav activeView={activeView} onViewChange={setActiveView} />
 
-      {/* Log Entry Modal */}
-      <LogEntryModal
-        key={selectedDate || "closed"}
-        isOpen={selectedDate !== null}
-        onClose={handleCloseModal}
-        dateKey={selectedDate}
-        entry={selectedDate ? getEntry(selectedDate) : null}
-        userSettings={userSettings}
-        onSave={handleSaveEntry}
-        onDelete={handleDeleteEntry}
-      />
+        {/* Log Entry Modal */}
+        <LogEntryModal
+          key={selectedDate || "closed"}
+          isOpen={selectedDate !== null}
+          onClose={handleCloseModal}
+          dateKey={selectedDate}
+          entry={selectedDate ? getEntry(selectedDate) : null}
+          userSettings={userSettings}
+          onSave={handleSaveEntry}
+          onDelete={handleDeleteEntry}
+        />
 
-      {/* Stackable Toast Notifications */}
-      <ToastContainer toasts={toasts} onDismiss={handleDismissToast} />
+        {/* Stackable Toast Notifications */}
+        <ToastContainer toasts={toasts} onDismiss={handleDismissToast} />
+      </div>
     </div>
   );
 }

@@ -19,6 +19,7 @@ import {
   formatDateLabel,
   type TimeFrame,
 } from "./WeightStats";
+import { useChartColors } from "./useChartColors";
 import type { EntriesMap } from "../../types";
 
 // Register Chart.js components
@@ -34,8 +35,8 @@ ChartJS.register(
 
 const TIMEFRAMES: { id: TimeFrame; label: string }[] = [
   { id: "30d", label: "30 Days" },
+  { id: "90d", label: "90 Days" },
   { id: "6m", label: "6 Months" },
-  { id: "1y", label: "1 Year" },
 ];
 
 interface WeightChartProps {
@@ -47,6 +48,7 @@ interface WeightChartProps {
  */
 const WeightChart = ({ entries }: WeightChartProps) => {
   const [timeframe, setTimeframe] = useState<TimeFrame>("30d");
+  const { primary: chartColor, background: chartBgColor } = useChartColors();
 
   const weightData = useWeightData(entries, timeframe);
   const stats = useMemo(() => calculateWeightStats(weightData), [weightData]);
@@ -57,20 +59,20 @@ const WeightChart = ({ entries }: WeightChartProps) => {
       datasets: [
         {
           data: weightData.map((d) => d.weight),
-          borderColor: "rgb(236, 72, 153)",
-          backgroundColor: "rgba(236, 72, 153, 0.1)",
+          borderColor: chartColor,
+          backgroundColor: chartBgColor,
           borderWidth: 2,
           fill: true,
           tension: 0.4,
           pointRadius: timeframe === "30d" ? 4 : 2,
-          pointBackgroundColor: "rgb(236, 72, 153)",
+          pointBackgroundColor: chartColor,
           pointBorderColor: "#fff",
           pointBorderWidth: 2,
           pointHoverRadius: 6,
         },
       ],
     }),
-    [weightData, timeframe],
+    [weightData, timeframe, chartColor, chartBgColor],
   );
 
   const chartOptions = useMemo<ChartOptions<"line">>(
@@ -78,14 +80,12 @@ const WeightChart = ({ entries }: WeightChartProps) => {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          display: false,
-        },
+        legend: { display: false },
         tooltip: {
-          backgroundColor: "rgba(30, 30, 60, 0.95)",
+          backgroundColor: "rgba(30, 30, 30, 0.9)",
           titleColor: "#fff",
-          bodyColor: "#a5a5c8",
-          borderColor: "rgba(139, 92, 246, 0.3)",
+          bodyColor: "#ccc",
+          borderColor: "rgba(255, 255, 255, 0.1)",
           borderWidth: 1,
           cornerRadius: 8,
           padding: 12,
@@ -98,26 +98,18 @@ const WeightChart = ({ entries }: WeightChartProps) => {
       },
       scales: {
         x: {
-          grid: {
-            display: false,
-          },
+          grid: { display: false },
           ticks: {
-            color: "#6b6b8a",
-            font: {
-              size: 10,
-            },
+            color: "#888",
+            font: { size: 10 },
             maxTicksLimit: 6,
           },
         },
         y: {
-          grid: {
-            color: "rgba(139, 92, 246, 0.1)",
-          },
+          grid: { color: "rgba(100, 100, 100, 0.1)" },
           ticks: {
-            color: "#6b6b8a",
-            font: {
-              size: 10,
-            },
+            color: "#888",
+            font: { size: 10 },
             callback: (value) => `${value}`,
           },
         },
@@ -133,11 +125,11 @@ const WeightChart = ({ entries }: WeightChartProps) => {
   const getTrendIcon = () => {
     switch (stats.trend) {
       case "up":
-        return <TrendingUp size={16} className="text-(color-accent)" />;
+        return <TrendingUp size={18} className="text-error" />;
       case "down":
-        return <TrendingDown size={16} className="text-(color-success)" />;
+        return <TrendingDown size={18} className="text-success" />;
       default:
-        return <Minus size={16} className="text-(text-muted)" />;
+        return <Minus size={18} className="text-base-content/40" />;
     }
   };
 
@@ -146,8 +138,8 @@ const WeightChart = ({ entries }: WeightChartProps) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Scale size={20} className="text-(color-secondary)" />
-          <h3 className="font-semibold text-(text-primary)">Weight Tracker</h3>
+          <Scale size={20} className="text-secondary" />
+          <h3 className="font-semibold text-base-content">Weight Tracker</h3>
         </div>
 
         {/* Timeframe Toggles */}
@@ -157,6 +149,7 @@ const WeightChart = ({ entries }: WeightChartProps) => {
               key={id}
               active={timeframe === id}
               onClick={() => setTimeframe(id)}
+              className="badge-sm"
             >
               {label}
             </Chip>
@@ -169,27 +162,23 @@ const WeightChart = ({ entries }: WeightChartProps) => {
         <>
           {/* Stats Row */}
           <div className="grid grid-cols-4 gap-2 mb-4">
-            <div className="text-center p-2 rounded-lg bg-(bg-tertiary)">
-              <div className="text-xs text-(text-muted)">Current</div>
-              <div className="text-sm font-semibold text-(text-primary)">
+            <div className="text-center p-2 rounded-lg bg-base-200 border border-base-content/5">
+              <div className="text-xs text-base-content/60">Current</div>
+              <div className="text-sm font-bold text-base-content">
                 {stats.current}
               </div>
             </div>
-            <div className="text-center p-2 rounded-lg bg-(bg-tertiary)">
-              <div className="text-xs text-(text-muted)">Min</div>
-              <div className="text-sm font-semibold text-(color-success)">
-                {stats.min}
-              </div>
+            <div className="text-center p-2 rounded-lg bg-base-200 border border-base-content/5">
+              <div className="text-xs text-base-content/60">Low</div>
+              <div className="text-sm font-bold text-success">{stats.min}</div>
             </div>
-            <div className="text-center p-2 rounded-lg bg-(bg-tertiary)">
-              <div className="text-xs text-(text-muted)">Max</div>
-              <div className="text-sm font-semibold text-(color-danger)">
-                {stats.max}
-              </div>
+            <div className="text-center p-2 rounded-lg bg-base-200 border border-base-content/5">
+              <div className="text-xs text-base-content/60">High</div>
+              <div className="text-sm font-bold text-error">{stats.max}</div>
             </div>
-            <div className="text-center p-2 rounded-lg bg-(bg-tertiary)">
-              <div className="text-xs text-(text-muted)">Trend</div>
-              <div className="flex items-center justify-center">
+            <div className="text-center p-2 rounded-lg bg-base-200 border border-base-content/5">
+              <div className="text-xs text-base-content/60">Trend</div>
+              <div className="flex items-center justify-center pt-0.5">
                 {getTrendIcon()}
               </div>
             </div>
@@ -202,11 +191,11 @@ const WeightChart = ({ entries }: WeightChartProps) => {
         </>
       ) : (
         <div className="h-48 flex flex-col items-center justify-center text-center">
-          <Scale size={40} className="text-(text-muted) mb-3" />
-          <p className="text-(text-secondary) text-sm">
+          <Scale size={40} className="text-base-content/30 mb-3" />
+          <p className="text-base-content/70 text-sm">
             No weight data for this period
           </p>
-          <p className="text-(text-muted) text-xs mt-1">
+          <p className="text-base-content/50 text-xs mt-1">
             Tap on a day to log your weight
           </p>
         </div>

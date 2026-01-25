@@ -15,84 +15,98 @@ const HistoryItem = ({ dateKey, entry, onClick }: HistoryItemProps) => {
   const date = parseISO(dateKey);
   const formattedDate = format(date, "EEEE, MMMM d, yyyy");
 
-  const getFlowColor = (flow?: string) => {
-    switch (flow?.toLowerCase()) {
+  const getFlowBadgeProps = (flow?: string) => {
+    const normalize = (f: string) => f.toLowerCase();
+    const style: React.CSSProperties = { color: "#ffffff", border: "none" };
+
+    switch (normalize(flow || "")) {
       case "spotting":
-        return "bg-[var(--flow-spotting)] text-gray-800";
+        style.backgroundColor = "var(--flow-spotting)";
+        break;
       case "light":
-        return "bg-[var(--flow-light)] text-gray-800";
+        style.backgroundColor = "var(--flow-light)";
+        break;
       case "medium":
-        return "bg-[var(--flow-medium)] text-white";
+        style.backgroundColor = "var(--flow-medium)";
+        break;
       case "heavy":
-        return "bg-[var(--flow-heavy)] text-white";
+        style.backgroundColor = "var(--flow-heavy)";
+        break;
+      case "v. heavy":
+        style.backgroundColor = "var(--flow-v-heavy)";
+        break;
+      case "clotting":
+        style.backgroundColor = "var(--flow-clotting)";
+        break;
       default:
-        return "bg-[var(--bg-tertiary)] text-[var(--text-secondary)]";
+        return { className: "badge badge-ghost gap-1" };
     }
+    return { className: "badge gap-1", style };
   };
 
   return (
     <button
       onClick={() => onClick(dateKey)}
-      className="w-full card hover:border-(--color-primary) transition-all duration-200 text-left mb-3"
+      className="w-full card card-compact bg-base-100 hover:bg-base-200 transition-all duration-200 text-left mb-2 shadow-sm border border-base-content/10"
     >
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <h3 className="font-medium text-(--text-primary) text-sm">
-            {formattedDate}
-          </h3>
+      <div className="card-body">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="font-bold text-base-content text-sm">
+              {formattedDate}
+            </h3>
 
-          {/* Entry Details */}
-          <div className="flex flex-wrap gap-2 mt-3">
-            {/* Flow */}
-            {entry.flow && entry.flow !== "None" && (
-              <span
-                className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getFlowColor(entry.flow)}`}
-              >
-                <Droplet size={12} />
-                {entry.flow}
-              </span>
-            )}
+            {/* Entry Details */}
+            <div className="flex flex-wrap gap-2 mt-3">
+              {/* Flow */}
+              {entry.flow && entry.flow !== "None" && (
+                <span {...getFlowBadgeProps(entry.flow)}>
+                  <Droplet size={12} />
+                  {entry.flow}
+                </span>
+              )}
 
-            {/* Weight */}
-            {entry.weight && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[#a855f7]/20 text-[#a855f7]">
-                <Scale size={12} />
-                {entry.weight} lbs
-              </span>
-            )}
+              {/* Weight */}
+              {entry.weight && (
+                <span className="badge badge-secondary gap-1">
+                  <Scale size={12} />
+                  {entry.weight} lbs
+                </span>
+              )}
 
-            {/* Moods */}
-            {entry.mood && entry.mood.length > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[#fbbf24]/20 text-[#fbbf24]">
-                <Brain size={12} />
-                {entry.mood.length} mood{entry.mood.length > 1 ? "s" : ""}
-              </span>
-            )}
+              {/* Moods */}
+              {entry.mood && entry.mood.length > 0 && (
+                <span className="badge badge-warning gap-1">
+                  <Brain size={12} />
+                  {entry.mood.length} mood{entry.mood.length > 1 ? "s" : ""}
+                </span>
+              )}
 
-            {/* Symptoms */}
-            {entry.symptoms && entry.symptoms.length > 0 && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[#06b6d4]/20 text-[#06b6d4]">
-                <Activity size={12} />
-                {entry.symptoms.length} symptom
-                {entry.symptoms.length > 1 ? "s" : ""}
-              </span>
-            )}
-          </div>
+              {/* Symptoms */}
+              {entry.symptoms && entry.symptoms.length > 0 && (
+                <span className="badge badge-info gap-1">
+                  <Activity size={12} />
+                  {entry.symptoms.length} symptom
+                  {entry.symptoms.length > 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
 
-          {/* Mood & Symptom Details */}
-          <div className="mt-2 space-y-1">
-            {entry.mood && entry.mood.length > 0 && (
-              <p className="text-xs text-(--text-secondary)">
-                <span className="text-[#fbbf24]">Moods:</span>{" "}
-                {entry.mood.join(", ")}
-              </p>
-            )}
-            {entry.symptoms && entry.symptoms.length > 0 && (
-              <p className="text-xs text-(--text-secondary)">
-                <span className="text-[#06b6d4]">Symptoms:</span>{" "}
-                {entry.symptoms.join(", ")}
-              </p>
-            )}
+            {/* Mood & Symptom Details */}
+            <div className="mt-2 space-y-1">
+              {entry.mood && entry.mood.length > 0 && (
+                <p className="text-xs text-base-content/70">
+                  <span className="text-warning font-medium">Moods:</span>{" "}
+                  {entry.mood.join(", ")}
+                </p>
+              )}
+              {entry.symptoms && entry.symptoms.length > 0 && (
+                <p className="text-xs text-base-content/70">
+                  <span className="text-info font-medium">Symptoms:</span>{" "}
+                  {entry.symptoms.join(", ")}
+                </p>
+              )}
+            </div>
           </div>
         </div>
       </div>
