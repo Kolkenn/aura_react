@@ -35,26 +35,37 @@ const DataManagement = ({ onExport, onImport, onClear, entryCount }) => {
 
     try {
       const text = await file.text();
+
+      // Log for debugging
+      console.log("File content length:", text.length);
+
       const result = onImport(text);
 
       if (result.success) {
+        const countMsg = result.entryCount
+          ? ` (${result.entryCount} entries)`
+          : "";
         setImportStatus({
           type: "success",
-          message: "Data imported successfully!",
+          message: `Data imported successfully!${countMsg}`,
         });
       } else {
         setImportStatus({
           type: "error",
-          message: result.error || "Import failed",
+          message: result.error || "Import failed - unknown error",
         });
       }
     } catch (error) {
-      setImportStatus({ type: "error", message: "Failed to read file" });
+      console.error("File read error:", error);
+      setImportStatus({
+        type: "error",
+        message: `Failed to read file: ${error.message}`,
+      });
     }
 
     // Reset file input
     e.target.value = "";
-    setTimeout(() => setImportStatus(null), 3000);
+    setTimeout(() => setImportStatus(null), 5000); // Longer display for errors
   };
 
   const handleClear = () => {

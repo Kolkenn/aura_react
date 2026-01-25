@@ -1,14 +1,15 @@
-import { useState } from "react";
-import { Moon, Wifi, WifiOff, RefreshCw } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
+import { Moon, Wifi, WifiOff, CheckCircle } from "lucide-react";
 
 // Hooks
 import { useLocalStorage } from "./hooks/useLocalStorage";
+import { usePWAUpdate } from "./hooks/usePWAUpdate";
 
 // Layout
-import { Header, BottomNav } from "./components/layout";
+import { BottomNav } from "./components/layout";
 
 // UI Components
-import { Card, Button } from "./components/ui";
+import { Card, ToastContainer } from "./components/ui";
 
 // Features
 import { CalendarGrid } from "./features/calendar";
@@ -19,15 +20,24 @@ import { ConfigForm, DataManagement } from "./features/settings";
 // Components
 import LogEntryModal from "./components/LogEntryModal";
 
-// App Version from package.json
+// App Version
 const APP_VERSION = "1.0.0";
 
 function App() {
   const [activeView, setActiveView] = useState("calendar");
   const [selectedDate, setSelectedDate] = useState(null);
-  // PWA update toast state - will be set by service worker when update is available
-  // eslint-disable-next-line no-unused-vars
-  const [showUpdateToast, setShowUpdateToast] = useState(false);
+  const [toasts, setToasts] = useState([]);
+
+  // PWA update detection
+  const {
+    needRefresh,
+    offlineReady,
+    isInstalled,
+    hasServiceWorker,
+    handleUpdate,
+    dismissToast: dismissUpdateToast,
+    dismissOfflineReady,
+  } = usePWAUpdate();
 
   // Data management hook
   const {
@@ -43,6 +53,60 @@ function App() {
     importData,
     clearAllData,
   } = useLocalStorage();
+
+  // Manage toasts based on PWA state
+  useEffect(() => {
+    if (offlineReady) {
+      const id = "offline-ready";
+      setToasts((prev) => {
+        if (prev.some((t) => t.id === id)) return prev;
+        return [
+          ...prev,
+          {
+            id,
+            message: "App ready for offline use!",
+            type: "success",
+            autoDismiss: true,
+            autoDismissTime: 4000,
+          },
+        ];
+      });
+    }
+  }, [offlineReady]);
+
+  useEffect(() => {
+    if (needRefresh) {
+      const id = "update-available";
+      setToasts((prev) => {
+        if (prev.some((t) => t.id === id)) return prev;
+        return [
+          ...prev,
+          {
+            id,
+            message: "New version available!",
+            type: "update",
+            action: handleUpdate,
+            actionLabel: "Update",
+            autoDismiss: false,
+          },
+        ];
+      });
+    } else {
+      // Remove update toast if needRefresh becomes false
+      setToasts((prev) => prev.filter((t) => t.id !== "update-available"));
+    }
+  }, [needRefresh, handleUpdate]);
+
+  // Handle toast dismissal
+  const handleDismissToast = (id) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+    if (id === "offline-ready") {
+      dismissOfflineReady();
+    }
+    if (id === "update-available") {
+      dismissUpdateToast();
+    }
+  };
 
   // Modal handlers
   const handleDayClick = (dateKey) => {
@@ -61,10 +125,12 @@ function App() {
     deleteEntry(dateKey);
   };
 
-  // Check if app is running as PWA
-  const isPWA =
-    window.matchMedia("(display-mode: standalone)").matches ||
-    window.navigator.standalone === true;
+  // PWA Status - show as installed if either standalone mode OR has active service worker
+  const pwaStatus = useMemo(() => {
+    if (isInstalled) return "installed";
+    if (hasServiceWorker) return "ready";
+    return "browser";
+  }, [isInstalled, hasServiceWorker]);
 
   // Render the active view
   const renderView = () => {
@@ -81,31 +147,6 @@ function App() {
           </div>
         );
 
-      case "weight":
-        return (
-          <div className="animate-fade-in">
-            <WeightChart entries={entries} />
-            <div className="mt-4">
-              <Card>
-                <h3 className="font-semibold text-[var(--text-primary)] mb-3">
-                  📊 Weight Tracking Tips
-                </h3>
-                <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
-                  <li>
-                    • Weigh yourself at the same time each day for consistency
-                  </li>
-                  <li>
-                    • Morning measurements after using the bathroom are most
-                    accurate
-                  </li>
-                  <li>• Weight fluctuations of 1-3 lbs daily are normal</li>
-                  <li>• Focus on weekly trends rather than daily changes</li>
-                </ul>
-              </Card>
-            </div>
-          </div>
-        );
-
       case "history":
         return (
           <div className="animate-fade-in">
@@ -119,38 +160,39 @@ function App() {
             {/* App Info */}
             <Card>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-secondary)] flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-pink-500 to-purple-500 flex items-center justify-center">
                   <Moon size={24} className="text-white" />
                 </div>
                 <div>
-                  <h2 className="font-semibold text-[var(--text-primary)]">
+                  <h2 className="font-semibold text-white">
                     Aura - Cycle Tracking
                   </h2>
-                  <p className="text-sm text-[var(--text-muted)]">
-                    Version {APP_VERSION}
-                  </p>
+                  <p className="text-sm text-gray-500">Version {APP_VERSION}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-[var(--text-secondary)]">
-                  PWA Status:
-                </span>
-                {isPWA ? (
-                  <span className="flex items-center gap-1 text-[var(--color-success)]">
-                    <Wifi size={14} />
+                <span className="text-gray-400">PWA Status:</span>
+                {pwaStatus === "installed" ? (
+                  <span className="flex items-center gap-1 text-green-500">
+                    <CheckCircle size={14} />
                     Installed
                   </span>
+                ) : pwaStatus === "ready" ? (
+                  <span className="flex items-center gap-1 text-blue-400">
+                    <Wifi size={14} />
+                    Ready to Install
+                  </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-[var(--text-muted)]">
+                  <span className="flex items-center gap-1 text-gray-500">
                     <WifiOff size={14} />
                     Running in Browser
                   </span>
                 )}
               </div>
 
-              <div className="mt-3 pt-3 border-t border-[var(--border-color)]">
-                <p className="text-xs text-[var(--text-muted)]">
+              <div className="mt-3 pt-3 border-t border-gray-700">
+                <p className="text-xs text-gray-500">
                   🔒 Your data is stored locally on this device. No data is sent
                   to any server.
                 </p>
@@ -181,12 +223,9 @@ function App() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen min-h-[100dvh]">
-      {/* Header */}
-      <Header />
-
+    <div className="flex flex-col min-h-screen">
       {/* Main Content */}
-      <main className="flex-1 overflow-y-auto px-4 py-4">{renderView()}</main>
+      <main className="flex-1 overflow-y-auto px-3 py-3">{renderView()}</main>
 
       {/* Bottom Navigation */}
       <BottomNav activeView={activeView} onViewChange={setActiveView} />
@@ -202,22 +241,8 @@ function App() {
         onDelete={handleDeleteEntry}
       />
 
-      {/* PWA Update Toast */}
-      {showUpdateToast && (
-        <div className="fixed bottom-24 left-4 right-4 z-50">
-          <div className="glass-strong rounded-xl p-4 flex items-center justify-between animate-slide-up">
-            <div className="flex items-center gap-3">
-              <RefreshCw size={20} className="text-[var(--color-primary)]" />
-              <span className="text-sm text-[var(--text-primary)]">
-                Update available!
-              </span>
-            </div>
-            <Button size="sm" onClick={() => window.location.reload()}>
-              Refresh
-            </Button>
-          </div>
-        </div>
-      )}
+      {/* Stackable Toast Notifications */}
+      <ToastContainer toasts={toasts} onDismiss={handleDismissToast} />
     </div>
   );
 }

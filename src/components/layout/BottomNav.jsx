@@ -1,19 +1,18 @@
-import { Calendar, BarChart3, Clock, Settings } from "lucide-react";
+import { Calendar, Clock, Settings } from "lucide-react";
 
 /**
  * Bottom navigation component for view switching
  */
 const BottomNav = ({ activeView, onViewChange }) => {
   const navItems = [
-    { id: "calendar", label: "Calendar", icon: Calendar },
-    { id: "weight", label: "Weight", icon: BarChart3 },
     { id: "history", label: "History", icon: Clock },
+    { id: "calendar", label: "Calendar", icon: Calendar },
     { id: "settings", label: "Settings", icon: Settings },
   ];
 
   return (
     <nav className="sticky bottom-0 z-40 glass-strong safe-bottom">
-      <div className="flex items-center justify-around py-2 px-2">
+      <div className="flex items-center justify-around py-1 px-2">
         {navItems.map(({ id, label, icon: Icon }) => {
           const isActive = activeView === id;
           return (

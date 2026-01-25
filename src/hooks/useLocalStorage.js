@@ -187,31 +187,228 @@ export function useLocalStorage() {
     URL.revokeObjectURL(url);
   }, [data]);
 
-  // Import data from JSON
+  // Import data from JSON with legacy format support
   const importData = useCallback((jsonData) => {
     try {
-      const parsed =
-        typeof jsonData === "string" ? JSON.parse(jsonData) : jsonData;
-
-      // Validate structure
-      if (!parsed.entries || typeof parsed.entries !== "object") {
-        throw new Error("Invalid data format: missing entries object");
+      // Parse if string
+      let parsed;
+      try {
+        parsed = typeof jsonData === "string" ? JSON.parse(jsonData) : jsonData;
+      } catch (parseError) {
+        console.error("JSON parse error:", parseError);
+        return {
+          success: false,
+          error: "Invalid JSON format. Please check your file.",
+        };
       }
 
-      // Merge imported data with defaults
-      const importedData = {
-        userSettings: {
-          ...DEFAULT_DATA.userSettings,
-          ...parsed.userSettings,
-        },
-        entries: parsed.entries,
+      // Handle null/undefined
+      if (!parsed || typeof parsed !== "object") {
+        return { success: false, error: "Invalid data: expected an object" };
+      }
+
+      console.log("Importing data structure:", Object.keys(parsed));
+
+      // Check for different possible data structures
+      let entries = null;
+      let userSettings = null;
+
+      // Format 1: Direct { entries: {...}, userSettings: {...} }
+      if (parsed.entries && typeof parsed.entries === "object") {
+        entries = parsed.entries;
+        userSettings = parsed.userSettings || null;
+      }
+      // Format 2: Just entries at root level (each key is a date)
+      else if (Object.keys(parsed).length > 0) {
+        const keys = Object.keys(parsed);
+        const looksLikeDates = keys.some((key) =>
+          /^\d{4}-\d{2}-\d{2}$/.test(key),
+        );
+
+        if (looksLikeDates) {
+          entries = parsed;
+          console.log("Detected legacy format: entries at root level");
+        }
+      }
+
+      // Validate we have entries
+      if (!entries || typeof entries !== "object") {
+        return {
+          success: false,
+          error:
+            "Could not find valid entries in the data. Expected format: { entries: { 'YYYY-MM-DD': {...} } }",
+        };
+      }
+
+      // ============ LEGACY FORMAT MIGRATION ============
+
+      // Helper to capitalize first letter
+      const toTitleCase = (str) => {
+        if (!str || typeof str !== "string") return str;
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
       };
 
+      // Migrate userSettings if it's in legacy format (object arrays)
+      let migratedSettings = { ...DEFAULT_DATA.userSettings };
+
+      if (userSettings) {
+        // Preserve averageCycleLength
+        if (userSettings.averageCycleLength) {
+          migratedSettings.averageCycleLength = userSettings.averageCycleLength;
+        }
+
+        // Migrate flowOptions from [{value, label, icon}] to ["Label"]
+        if (Array.isArray(userSettings.flowOptions)) {
+          const firstFlow = userSettings.flowOptions[0];
+          if (firstFlow && typeof firstFlow === "object" && firstFlow.label) {
+            // Legacy format - extract labels
+            migratedSettings.flowOptions = [
+              "None",
+              ...userSettings.flowOptions.map((opt) => opt.label),
+            ];
+            console.log("Migrated flowOptions from object format");
+          } else if (typeof firstFlow === "string") {
+            // Already string format
+            migratedSettings.flowOptions = userSettings.flowOptions;
+          }
+        }
+
+        // Migrate moodOptions from [{value, label, icon}] to ["Label"]
+        if (Array.isArray(userSettings.moodOptions)) {
+          const firstMood = userSettings.moodOptions[0];
+          if (firstMood && typeof firstMood === "object" && firstMood.label) {
+            // Legacy format - extract labels
+            migratedSettings.moodOptions = userSettings.moodOptions.map(
+              (opt) => opt.label,
+            );
+            console.log("Migrated moodOptions from object format");
+          } else if (typeof firstMood === "string") {
+            // Already string format
+            migratedSettings.moodOptions = userSettings.moodOptions;
+          }
+        }
+
+        // symptomOptions is already string array in legacy format
+        if (Array.isArray(userSettings.symptomOptions)) {
+          migratedSettings.symptomOptions = userSettings.symptomOptions;
+        }
+      }
+
+      // Build flow value mapping from legacy (lowercase) to new (Title Case)
+      const buildFlowMapping = () => {
+        const mapping = {};
+        if (
+          userSettings?.flowOptions &&
+          Array.isArray(userSettings.flowOptions)
+        ) {
+          userSettings.flowOptions.forEach((opt) => {
+            if (opt && typeof opt === "object" && opt.value && opt.label) {
+              mapping[opt.value] = opt.label;
+            }
+          });
+        }
+        // Add common defaults
+        mapping["spotting"] = "Spotting";
+        mapping["light"] = "Light";
+        mapping["medium"] = "Medium";
+        mapping["heavy"] = "Heavy";
+        mapping["vheavy"] = "V. Heavy";
+        mapping["clots"] = "Clots";
+        mapping["none"] = "None";
+        return mapping;
+      };
+
+      // Build mood value mapping from legacy (lowercase) to new (Title Case)
+      const buildMoodMapping = () => {
+        const mapping = {};
+        if (
+          userSettings?.moodOptions &&
+          Array.isArray(userSettings.moodOptions)
+        ) {
+          userSettings.moodOptions.forEach((opt) => {
+            if (opt && typeof opt === "object" && opt.value && opt.label) {
+              mapping[opt.value] = opt.label;
+            }
+          });
+        }
+        // Add common defaults
+        mapping["happy"] = "Happy";
+        mapping["neutral"] = "Neutral";
+        mapping["sad"] = "Sad";
+        mapping["irritable"] = "Irritable";
+        mapping["tired"] = "Tired";
+        mapping["anxious"] = "Anxious";
+        mapping["energetic"] = "Energetic";
+        mapping["romantic"] = "Romantic";
+        mapping["confident"] = "Confident";
+        mapping["emotional"] = "Emotional";
+        mapping["calm"] = "Calm";
+        mapping["moody"] = "Moody";
+        return mapping;
+      };
+
+      const flowMapping = buildFlowMapping();
+      const moodMapping = buildMoodMapping();
+
+      // Migrate entries
+      const migratedEntries = {};
+      let migrationCount = 0;
+
+      Object.entries(entries).forEach(([dateKey, entry]) => {
+        if (!entry || typeof entry !== "object") return;
+
+        const migratedEntry = { ...entry };
+
+        // Migrate flow value (lowercase -> Title Case)
+        if (entry.flow && typeof entry.flow === "string") {
+          const mappedFlow = flowMapping[entry.flow.toLowerCase()];
+          if (mappedFlow && mappedFlow !== entry.flow) {
+            migratedEntry.flow = mappedFlow;
+            migrationCount++;
+          } else if (!mappedFlow) {
+            // If no mapping found, just title case it
+            migratedEntry.flow = toTitleCase(entry.flow);
+          }
+        }
+
+        // Migrate mood values (lowercase -> Title Case)
+        if (Array.isArray(entry.mood)) {
+          migratedEntry.mood = entry.mood.map((m) => {
+            if (typeof m !== "string") return m;
+            const mappedMood = moodMapping[m.toLowerCase()];
+            if (mappedMood) {
+              if (mappedMood !== m) migrationCount++;
+              return mappedMood;
+            }
+            return toTitleCase(m);
+          });
+        }
+
+        // Symptoms are already in correct format (strings)
+        // Weight is stored as string, no change needed
+
+        migratedEntries[dateKey] = migratedEntry;
+      });
+
+      if (migrationCount > 0) {
+        console.log(`Migrated ${migrationCount} values from legacy format`);
+      }
+
+      // Build the final imported data
+      const importedData = {
+        userSettings: migratedSettings,
+        entries: migratedEntries,
+      };
+
+      console.log(
+        "Import successful, entry count:",
+        Object.keys(migratedEntries).length,
+      );
       setData(importedData);
-      return { success: true };
+      return { success: true, entryCount: Object.keys(migratedEntries).length };
     } catch (error) {
       console.error("Error importing data:", error);
-      return { success: false, error: error.message };
+      return { success: false, error: error.message || "Unknown import error" };
     }
   }, []);
 
