@@ -126,13 +126,11 @@ const WeightChart = ({ entries }) => {
   const getTrendIcon = () => {
     switch (stats.trend) {
       case "up":
-        return <TrendingUp size={16} className="text-[var(--color-accent)]" />;
+        return <TrendingUp size={16} className="text-(color-accent)" />;
       case "down":
-        return (
-          <TrendingDown size={16} className="text-[var(--color-success)]" />
-        );
+        return <TrendingDown size={16} className="text-(color-success)" />;
       default:
-        return <Minus size={16} className="text-[var(--text-muted)]" />;
+        return <Minus size={16} className="text-(text-muted)" />;
     }
   };
 
@@ -141,10 +139,8 @@ const WeightChart = ({ entries }) => {
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <Scale size={20} className="text-[var(--color-secondary)]" />
-          <h3 className="font-semibold text-[var(--text-primary)]">
-            Weight Tracker
-          </h3>
+          <Scale size={20} className="text-(color-secondary)" />
+          <h3 className="font-semibold text-(text-primary)">Weight Tracker</h3>
         </div>
 
         {/* Timeframe Toggles */}
@@ -166,26 +162,26 @@ const WeightChart = ({ entries }) => {
         <>
           {/* Stats Row */}
           <div className="grid grid-cols-4 gap-2 mb-4">
-            <div className="text-center p-2 rounded-lg bg-[var(--bg-tertiary)]">
-              <div className="text-xs text-[var(--text-muted)]">Current</div>
-              <div className="text-sm font-semibold text-[var(--text-primary)]">
+            <div className="text-center p-2 rounded-lg bg-(bg-tertiary)">
+              <div className="text-xs text-(text-muted)">Current</div>
+              <div className="text-sm font-semibold text-(text-primary)">
                 {stats.current}
               </div>
             </div>
-            <div className="text-center p-2 rounded-lg bg-[var(--bg-tertiary)]">
-              <div className="text-xs text-[var(--text-muted)]">Min</div>
-              <div className="text-sm font-semibold text-[var(--color-success)]">
+            <div className="text-center p-2 rounded-lg bg-(bg-tertiary)">
+              <div className="text-xs text-(text-muted)">Min</div>
+              <div className="text-sm font-semibold text-(color-success)">
                 {stats.min}
               </div>
             </div>
-            <div className="text-center p-2 rounded-lg bg-[var(--bg-tertiary)]">
-              <div className="text-xs text-[var(--text-muted)]">Max</div>
-              <div className="text-sm font-semibold text-[var(--color-danger)]">
+            <div className="text-center p-2 rounded-lg bg-(bg-tertiary)">
+              <div className="text-xs text-(text-muted)">Max</div>
+              <div className="text-sm font-semibold text-(color-danger)">
                 {stats.max}
               </div>
             </div>
-            <div className="text-center p-2 rounded-lg bg-[var(--bg-tertiary)]">
-              <div className="text-xs text-[var(--text-muted)]">Trend</div>
+            <div className="text-center p-2 rounded-lg bg-(bg-tertiary)">
+              <div className="text-xs text-(text-muted)">Trend</div>
               <div className="flex items-center justify-center">
                 {getTrendIcon()}
               </div>
@@ -199,11 +195,11 @@ const WeightChart = ({ entries }) => {
         </>
       ) : (
         <div className="h-48 flex flex-col items-center justify-center text-center">
-          <Scale size={40} className="text-[var(--text-muted)] mb-3" />
-          <p className="text-[var(--text-secondary)] text-sm">
+          <Scale size={40} className="text-(text-muted) mb-3" />
+          <p className="text-(text-secondary) text-sm">
             No weight data for this period
           </p>
-          <p className="text-[var(--text-muted)] text-xs mt-1">
+          <p className="text-(text-muted) text-xs mt-1">
             Tap on a day to log your weight
           </p>
         </div>

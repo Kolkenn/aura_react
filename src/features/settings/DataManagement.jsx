@@ -78,7 +78,7 @@ const DataManagement = ({ onExport, onImport, onClear, entryCount }) => {
   return (
     <>
       <Card>
-        <h3 className="font-medium text-[var(--text-primary)] mb-4">
+        <h3 className="font-medium text-(--text-primary) mb-4">
           Data Management
         </h3>
 
@@ -121,7 +121,7 @@ const DataManagement = ({ onExport, onImport, onClear, entryCount }) => {
           </Button>
 
           {/* Entry Count */}
-          <p className="text-xs text-[var(--text-muted)] text-center pt-2">
+          <p className="text-xs text-(text-muted) text-center pt-2">
             {entryCount} entries currently stored
           </p>
 
@@ -130,8 +130,8 @@ const DataManagement = ({ onExport, onImport, onClear, entryCount }) => {
             <div
               className={`flex items-center gap-2 p-3 rounded-lg text-sm ${
                 importStatus.type === "success"
-                  ? "bg-[var(--color-success)]/20 text-[var(--color-success)]"
-                  : "bg-[var(--color-danger)]/20 text-[var(--color-danger)]"
+                  ? "bg-(color-success)/20 text-(color-success)"
+                  : "bg-(color-danger)/20 text-(color-danger)"
               }`}
             >
               {importStatus.type === "success" ? (
@@ -153,16 +153,13 @@ const DataManagement = ({ onExport, onImport, onClear, entryCount }) => {
         size="sm"
       >
         <div className="space-y-4">
-          <div className="flex items-start gap-3 p-3 rounded-lg bg-[var(--color-danger)]/10">
-            <AlertTriangle
-              size={24}
-              className="text-[var(--color-danger)] flex-shrink-0"
-            />
+          <div className="flex items-start gap-3 p-3 rounded-lg bg-(color-danger)/10">
+            <AlertTriangle size={24} className="text-(color-danger) shrink-0" />
             <div>
-              <p className="text-[var(--text-primary)] font-medium">
+              <p className="text-(text-primary) font-medium">
                 This action cannot be undone
               </p>
-              <p className="text-sm text-[var(--text-secondary)] mt-1">
+              <p className="text-sm text-(text-secondary) mt-1">
                 All your entries, settings, and history will be permanently
                 deleted.
               </p>

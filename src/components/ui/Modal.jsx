@@ -55,14 +55,14 @@ const Modal = ({
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-5 border-b border-[var(--border-color)]">
+          <div className="flex items-center justify-between p-5 border-b border-(border-color)">
             {title && (
               <h2 className="text-lg font-semibold gradient-text">{title}</h2>
             )}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="p-1 rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors text-[var(--text-secondary)]"
+                className="p-1 rounded-lg hover:bg-(bg-tertiary) transition-colors text-(text-secondary)"
                 aria-label="Close modal"
               >
                 <X size={20} />

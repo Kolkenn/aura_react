@@ -21,7 +21,7 @@ import { ConfigForm, DataManagement } from "./features/settings";
 import LogEntryModal from "./components/LogEntryModal";
 
 // App Version
-const APP_VERSION = "1.0.0";
+const APP_VERSION = "1.0.1";
 
 function App() {
   const [activeView, setActiveView] = useState("calendar");

@@ -44,19 +44,19 @@ const CalendarGrid = ({ entries, averageCycleLength, onDayClick }) => {
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={handlePrevMonth}
-          className="p-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors text-[var(--text-secondary)]"
+          className="p-2 rounded-lg hover:bg-(bg-tertiary) transition-colors text-(text-secondary)"
           aria-label="Previous month"
         >
           <ChevronLeft size={20} />
         </button>
 
-        <h2 className="text-lg font-semibold text-[var(--text-primary)]">
+        <h2 className="text-lg font-semibold text-(text-primary)">
           {format(currentMonth, "MMMM yyyy")}
         </h2>
 
         <button
           onClick={handleNextMonth}
-          className="p-2 rounded-lg hover:bg-[var(--bg-tertiary)] transition-colors text-[var(--text-secondary)]"
+          className="p-2 rounded-lg hover:bg-(bg-tertiary) transition-colors text-(text-secondary)"
           aria-label="Next month"
         >
           <ChevronRight size={20} />
@@ -68,7 +68,7 @@ const CalendarGrid = ({ entries, averageCycleLength, onDayClick }) => {
         {WEEKDAYS.map((day) => (
           <div
             key={day}
-            className="text-center text-xs font-medium text-[var(--text-muted)] py-2"
+            className="text-center text-xs font-medium text-(text-muted) py-2"
           >
             {day}
           </div>
@@ -125,21 +125,21 @@ const CalendarGrid = ({ entries, averageCycleLength, onDayClick }) => {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-[var(--border-color)]">
-        <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
-          <span className="w-3 h-3 rounded bg-[var(--color-primary)]" />
+      <div className="flex flex-wrap gap-3 mt-4 pt-4 border-t border-(border-color)">
+        <div className="flex items-center gap-1.5 text-xs text-(text-muted)">
+          <span className="w-3 h-3 rounded bg-(color-primary)" />
           <span>Flow</span>
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
-          <span className="w-3 h-3 rounded border-2 border-dashed border-[var(--color-primary)]" />
+        <div className="flex items-center gap-1.5 text-xs text-(text-muted)">
+          <span className="w-3 h-3 rounded border-2 border-dashed border-(color-primary)" />
           <span>Predicted</span>
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
-          <span className="w-2 h-2 rounded-full bg-[#fbbf24]" />
+        <div className="flex items-center gap-1.5 text-xs text-(text-muted)">
+          <span className="w-2 h-2 rounded-full bg-(fbbf24)" />
           <span>Mood</span>
         </div>
-        <div className="flex items-center gap-1.5 text-xs text-[var(--text-muted)]">
-          <span className="w-2 h-2 rounded-full bg-[#a855f7]" />
+        <div className="flex items-center gap-1.5 text-xs text-(text-muted)">
+          <span className="w-2 h-2 rounded-full bg-(a855f7)" />
           <span>Weight</span>
         </div>
       </div>

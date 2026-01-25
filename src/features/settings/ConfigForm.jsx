@@ -44,11 +44,9 @@ const ConfigForm = ({
     <div className="space-y-4">
       {/* Cycle Length */}
       <Card>
-        <h3 className="font-medium text-[var(--text-primary)] mb-3">
-          Cycle Settings
-        </h3>
+        <h3 className="font-medium text-(text-primary) mb-3">Cycle Settings</h3>
         <div className="flex items-center gap-3">
-          <label className="text-sm text-[var(--text-secondary)]">
+          <label className="text-sm text-(text-secondary)">
             Average Cycle Length
           </label>
           <input
@@ -59,17 +57,15 @@ const ConfigForm = ({
             onChange={handleCycleLengthChange}
             className="input w-20 text-center"
           />
-          <span className="text-sm text-[var(--text-muted)]">days</span>
+          <span className="text-sm text-(text-muted)">days</span>
         </div>
       </Card>
 
       {/* Mood Options */}
       <Card>
         <div className="flex items-center gap-2 mb-3">
-          <Brain size={18} className="text-[#fbbf24]" />
-          <h3 className="font-medium text-[var(--text-primary)]">
-            Mood Options
-          </h3>
+          <Brain size={18} className="text-(fbbf24)" />
+          <h3 className="font-medium text-(text-primary)">Mood Options</h3>
         </div>
 
         {/* Add New Mood */}
@@ -90,12 +86,12 @@ const ConfigForm = ({
           {userSettings.moodOptions?.map((mood) => (
             <span
               key={mood}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)]"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-(bg-tertiary) text-(text-secondary) border border-(border-color)"
             >
               {mood}
               <button
                 onClick={() => onRemoveOption("mood", mood)}
-                className="ml-1 hover:text-[var(--color-danger)] transition-colors"
+                className="ml-1 hover:text-(color-danger) transition-colors"
                 aria-label={`Remove ${mood}`}
               >
                 <X size={12} />
@@ -108,10 +104,8 @@ const ConfigForm = ({
       {/* Symptom Options */}
       <Card>
         <div className="flex items-center gap-2 mb-3">
-          <Activity size={18} className="text-[#06b6d4]" />
-          <h3 className="font-medium text-[var(--text-primary)]">
-            Symptom Options
-          </h3>
+          <Activity size={18} className="text-(06b6d4)" />
+          <h3 className="font-medium text-(text-primary)">Symptom Options</h3>
         </div>
 
         {/* Add New Symptom */}
@@ -132,12 +126,12 @@ const ConfigForm = ({
           {userSettings.symptomOptions?.map((symptom) => (
             <span
               key={symptom}
-              className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-[var(--bg-tertiary)] text-[var(--text-secondary)] border border-[var(--border-color)]"
+              className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-(bg-tertiary) text-(text-secondary) border border-[border-color]"
             >
               {symptom}
               <button
                 onClick={() => onRemoveOption("symptom", symptom)}
-                className="ml-1 hover:text-[var(--color-danger)] transition-colors"
+                className="ml-1 hover:text-[color-danger] transition-colors"
                 aria-label={`Remove ${symptom}`}
               >
                 <X size={12} />

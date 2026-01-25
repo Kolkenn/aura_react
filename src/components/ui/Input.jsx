@@ -12,7 +12,7 @@ const Input = forwardRef(
         {label && (
           <label
             htmlFor={inputId}
-            className="block text-sm font-medium text-[var(--text-secondary)] mb-2"
+            className="block text-sm font-medium text-(text-secondary) mb-2"
           >
             {label}
           </label>
@@ -20,12 +20,10 @@ const Input = forwardRef(
         <input
           ref={ref}
           id={inputId}
-          className={`input ${error ? "border-[var(--color-danger)]" : ""} ${className}`}
+          className={`input ${error ? "border-(color-danger)" : ""} ${className}`}
           {...props}
         />
-        {error && (
-          <p className="mt-1 text-xs text-[var(--color-danger)]">{error}</p>
-        )}
+        {error && <p className="mt-1 text-xs text-(color-danger)">{error}</p>}
       </div>
     );
   },
