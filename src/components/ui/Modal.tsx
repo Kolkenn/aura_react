@@ -1,5 +1,16 @@
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, type ReactNode } from "react";
 import { X } from "lucide-react";
+
+type ModalSize = "sm" | "md" | "lg" | "xl" | "full";
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  title?: string;
+  children?: ReactNode;
+  showCloseButton?: boolean;
+  size?: ModalSize;
+}
 
 /**
  * Modal component with backdrop and animations
@@ -11,10 +22,10 @@ const Modal = ({
   children,
   showCloseButton = true,
   size = "md",
-}) => {
+}: ModalProps) => {
   // Handle escape key
   const handleEscape = useCallback(
-    (e) => {
+    (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         onClose();
       }
@@ -35,7 +46,7 @@ const Modal = ({
 
   if (!isOpen) return null;
 
-  const sizeClasses = {
+  const sizeClasses: Record<ModalSize, string> = {
     sm: "max-w-sm",
     md: "max-w-md",
     lg: "max-w-lg",

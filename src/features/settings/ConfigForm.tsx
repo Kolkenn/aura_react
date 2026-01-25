@@ -1,6 +1,14 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Plus, X, Brain, Activity } from "lucide-react";
-import { Card, Button, Input, Chip } from "../../components/ui";
+import { Card, Button, Input } from "../../components/ui";
+import type { UserSettings } from "../../types";
+
+interface ConfigFormProps {
+  userSettings: UserSettings;
+  onAddOption: (type: "mood" | "symptom", option: string) => void;
+  onRemoveOption: (type: "mood" | "symptom", option: string) => void;
+  onUpdateSettings: (settings: Partial<UserSettings>) => void;
+}
 
 /**
  * Configuration form for managing custom moods and symptoms
@@ -10,7 +18,7 @@ const ConfigForm = ({
   onAddOption,
   onRemoveOption,
   onUpdateSettings,
-}) => {
+}: ConfigFormProps) => {
   const [newMood, setNewMood] = useState("");
   const [newSymptom, setNewSymptom] = useState("");
   const [cycleLength, setCycleLength] = useState(
@@ -31,7 +39,7 @@ const ConfigForm = ({
     }
   };
 
-  const handleCycleLengthChange = (e) => {
+  const handleCycleLengthChange = (e: ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setCycleLength(value);
     const numValue = parseInt(value, 10);

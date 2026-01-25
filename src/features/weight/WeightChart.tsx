@@ -9,6 +9,7 @@ import {
   Title,
   Tooltip,
   Filler,
+  ChartOptions,
 } from "chart.js";
 import { TrendingUp, TrendingDown, Minus, Scale } from "lucide-react";
 import { Card, Chip } from "../../components/ui";
@@ -16,7 +17,9 @@ import {
   useWeightData,
   calculateWeightStats,
   formatDateLabel,
+  type TimeFrame,
 } from "./WeightStats";
+import type { EntriesMap } from "../../types";
 
 // Register Chart.js components
 ChartJS.register(
@@ -29,17 +32,21 @@ ChartJS.register(
   Filler,
 );
 
-const TIMEFRAMES = [
+const TIMEFRAMES: { id: TimeFrame; label: string }[] = [
   { id: "30d", label: "30 Days" },
   { id: "6m", label: "6 Months" },
   { id: "1y", label: "1 Year" },
 ];
 
+interface WeightChartProps {
+  entries: EntriesMap;
+}
+
 /**
  * Weight Chart component with timeframe toggles
  */
-const WeightChart = ({ entries }) => {
-  const [timeframe, setTimeframe] = useState("30d");
+const WeightChart = ({ entries }: WeightChartProps) => {
+  const [timeframe, setTimeframe] = useState<TimeFrame>("30d");
 
   const weightData = useWeightData(entries, timeframe);
   const stats = useMemo(() => calculateWeightStats(weightData), [weightData]);
@@ -66,7 +73,7 @@ const WeightChart = ({ entries }) => {
     [weightData, timeframe],
   );
 
-  const chartOptions = useMemo(
+  const chartOptions = useMemo<ChartOptions<"line">>(
     () => ({
       responsive: true,
       maintainAspectRatio: false,
@@ -85,7 +92,7 @@ const WeightChart = ({ entries }) => {
           displayColors: false,
           callbacks: {
             title: (items) => items[0]?.label || "",
-            label: (context) => `${context.parsed.y.toFixed(1)} lbs`,
+            label: (context) => `${(context.parsed.y || 0).toFixed(1)} lbs`,
           },
         },
       },

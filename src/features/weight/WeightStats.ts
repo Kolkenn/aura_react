@@ -8,14 +8,34 @@ import {
   isBefore,
   startOfDay,
 } from "date-fns";
+import type { EntriesMap } from "../../types";
+
+export interface WeightDataPoint {
+  date: Date;
+  dateKey: string;
+  weight: number;
+}
+
+export interface WeightStats {
+  current: string | null;
+  min: string | null;
+  max: string | null;
+  avg: string | null;
+  trend: "up" | "down" | "stable" | null;
+}
+
+export type TimeFrame = "30d" | "6m" | "1y";
 
 /**
  * Filter entries by date range and extract weight data for charts
  */
-export function useWeightData(entries, timeframe) {
+export function useWeightData(
+  entries: EntriesMap,
+  timeframe: TimeFrame,
+): WeightDataPoint[] {
   return useMemo(() => {
     const now = new Date();
-    let startDate;
+    let startDate: Date;
 
     switch (timeframe) {
       case "30d":
@@ -40,10 +60,10 @@ export function useWeightData(entries, timeframe) {
       .map(([dateKey, entry]) => ({
         date: parseISO(dateKey),
         dateKey,
-        weight: parseFloat(entry.weight),
+        weight: parseFloat(entry.weight || "0"),
       }))
       .filter((item) => !isNaN(item.weight))
-      .sort((a, b) => a.date - b.date);
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
 
     return weightEntries;
   }, [entries, timeframe]);
@@ -52,7 +72,9 @@ export function useWeightData(entries, timeframe) {
 /**
  * Calculate weight statistics
  */
-export function calculateWeightStats(weightData) {
+export function calculateWeightStats(
+  weightData: WeightDataPoint[],
+): WeightStats {
   if (weightData.length === 0) {
     return { current: null, min: null, max: null, avg: null, trend: null };
   }
@@ -64,7 +86,7 @@ export function calculateWeightStats(weightData) {
   const avg = weights.reduce((a, b) => a + b, 0) / weights.length;
 
   // Calculate trend (compare first half vs second half average)
-  let trend = null;
+  let trend: "up" | "down" | "stable" | null = null;
   if (weights.length >= 4) {
     const midpoint = Math.floor(weights.length / 2);
     const firstHalfAvg =
@@ -92,7 +114,7 @@ export function calculateWeightStats(weightData) {
 /**
  * Format date labels based on timeframe
  */
-export function formatDateLabel(date, timeframe) {
+export function formatDateLabel(date: Date, timeframe: TimeFrame): string {
   switch (timeframe) {
     case "30d":
       return format(date, "MMM d");

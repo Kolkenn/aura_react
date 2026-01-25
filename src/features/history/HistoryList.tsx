@@ -1,16 +1,24 @@
 import { useMemo } from "react";
 import { parseISO } from "date-fns";
-import { Clock, Search } from "lucide-react";
+import { Clock } from "lucide-react";
 import HistoryItem from "./HistoryItem";
+import type { EntriesMap } from "../../types";
+
+interface HistoryListProps {
+  entries: EntriesMap;
+  onEntryClick: (dateKey: string) => void;
+}
 
 /**
  * History List component showing all entries sorted by date
  */
-const HistoryList = ({ entries, onEntryClick }) => {
+const HistoryList = ({ entries, onEntryClick }: HistoryListProps) => {
   const sortedEntries = useMemo(() => {
     return Object.entries(entries)
       .map(([dateKey, entry]) => ({ dateKey, entry }))
-      .sort((a, b) => parseISO(b.dateKey) - parseISO(a.dateKey));
+      .sort(
+        (a, b) => parseISO(b.dateKey).getTime() - parseISO(a.dateKey).getTime(),
+      );
   }, [entries]);
 
   if (sortedEntries.length === 0) {

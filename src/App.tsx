@@ -1,9 +1,12 @@
 import { useState, useEffect, useMemo } from "react";
-import { Moon, Wifi, WifiOff, CheckCircle } from "lucide-react";
+import { Wifi, WifiOff, CheckCircle } from "lucide-react";
+
+// Types
+import type { Toast, ViewType, Entry } from "./types";
 
 // Hooks
-import { useLocalStorage } from "./hooks/useLocalStorage";
-import { usePWAUpdate } from "./hooks/usePWAUpdate";
+import { useLocalStorage } from "./hooks/useLocalStorage.ts";
+import { usePWAUpdate } from "./hooks/usePWAUpdate.ts";
 
 // Layout
 import { BottomNav } from "./components/layout";
@@ -21,12 +24,12 @@ import { ConfigForm, DataManagement } from "./features/settings";
 import LogEntryModal from "./components/LogEntryModal";
 
 // App Version
-const APP_VERSION = "1.0.2";
+const APP_VERSION = "1.0.3";
 
 function App() {
-  const [activeView, setActiveView] = useState("calendar");
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [toasts, setToasts] = useState([]);
+  const [activeView, setActiveView] = useState<ViewType>("calendar");
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [toasts, setToasts] = useState<Toast[]>([]);
 
   // PWA update detection
   const {
@@ -55,50 +58,57 @@ function App() {
   } = useLocalStorage();
 
   // Manage toasts based on PWA state
+  // Manage toasts based on PWA state
   useEffect(() => {
     if (offlineReady) {
       const id = "offline-ready";
-      setToasts((prev) => {
-        if (prev.some((t) => t.id === id)) return prev;
-        return [
-          ...prev,
-          {
-            id,
-            message: "App ready for offline use!",
-            type: "success",
-            autoDismiss: true,
-            autoDismissTime: 4000,
-          },
-        ];
-      });
+      setTimeout(() => {
+        setToasts((prev) => {
+          if (prev.some((t) => t.id === id)) return prev;
+          return [
+            ...prev,
+            {
+              id,
+              message: "App ready for offline use!",
+              type: "success" as const,
+              autoDismiss: true,
+              autoDismissTime: 4000,
+            },
+          ];
+        });
+      }, 0);
     }
   }, [offlineReady]);
 
   useEffect(() => {
     if (needRefresh) {
       const id = "update-available";
-      setToasts((prev) => {
-        if (prev.some((t) => t.id === id)) return prev;
-        return [
-          ...prev,
-          {
-            id,
-            message: "New version available!",
-            type: "update",
-            action: handleUpdate,
-            actionLabel: "Update",
-            autoDismiss: false,
-          },
-        ];
-      });
+      setTimeout(() => {
+        setToasts((prev) => {
+          if (prev.some((t) => t.id === id)) return prev;
+          return [
+            ...prev,
+            {
+              id,
+              message: "New version available!",
+              type: "update" as const,
+              action: handleUpdate,
+              actionLabel: "Update",
+              autoDismiss: false,
+            },
+          ];
+        });
+      }, 0);
     } else {
       // Remove update toast if needRefresh becomes false
-      setToasts((prev) => prev.filter((t) => t.id !== "update-available"));
+      setTimeout(() => {
+        setToasts((prev) => prev.filter((t) => t.id !== "update-available"));
+      }, 0);
     }
   }, [needRefresh, handleUpdate]);
 
   // Handle toast dismissal
-  const handleDismissToast = (id) => {
+  const handleDismissToast = (id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
     if (id === "offline-ready") {
       dismissOfflineReady();
@@ -109,7 +119,7 @@ function App() {
   };
 
   // Modal handlers
-  const handleDayClick = (dateKey) => {
+  const handleDayClick = (dateKey: string) => {
     setSelectedDate(dateKey);
   };
 
@@ -117,11 +127,11 @@ function App() {
     setSelectedDate(null);
   };
 
-  const handleSaveEntry = (dateKey, entryData) => {
+  const handleSaveEntry = (dateKey: string, entryData: Partial<Entry>) => {
     saveEntry(dateKey, entryData);
   };
 
-  const handleDeleteEntry = (dateKey) => {
+  const handleDeleteEntry = (dateKey: string) => {
     deleteEntry(dateKey);
   };
 
@@ -160,19 +170,14 @@ function App() {
             {/* App Info */}
             <Card>
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-linear-to-br from-pink-500 to-purple-500 flex items-center justify-center">
-                  <Moon size={24} className="text-white" />
-                </div>
                 <div>
-                  <h2 className="font-semibold text-white">
-                    Aura - Cycle Tracking
-                  </h2>
+                  <h2 className="font-semibold text-white">Aura</h2>
                   <p className="text-sm text-gray-500">Version {APP_VERSION}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 text-sm">
-                <span className="text-gray-400">PWA Status:</span>
+                <span className="text-gray-400">App Status:</span>
                 {pwaStatus === "installed" ? (
                   <span className="flex items-center gap-1 text-green-500">
                     <CheckCircle size={14} />
@@ -232,6 +237,7 @@ function App() {
 
       {/* Log Entry Modal */}
       <LogEntryModal
+        key={selectedDate || "closed"}
         isOpen={selectedDate !== null}
         onClose={handleCloseModal}
         dateKey={selectedDate}

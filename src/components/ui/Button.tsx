@@ -1,9 +1,15 @@
-import { forwardRef } from "react";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
+import type { ButtonVariant, ButtonSize } from "../../types";
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+}
 
 /**
  * Reusable Button component with multiple variants
  */
-const Button = forwardRef(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       children,
@@ -18,14 +24,14 @@ const Button = forwardRef(
   ) => {
     const baseClasses = "btn";
 
-    const variantClasses = {
+    const variantClasses: Record<ButtonVariant, string> = {
       primary: "btn-primary",
       secondary: "btn-secondary",
       danger: "btn-danger",
       ghost: "btn-ghost",
     };
 
-    const sizeClasses = {
+    const sizeClasses: Record<ButtonSize, string> = {
       sm: "text-xs py-2 px-3",
       md: "text-sm py-3 px-4",
       lg: "text-base py-4 px-6",

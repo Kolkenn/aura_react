@@ -1,14 +1,21 @@
 import { format, parseISO } from "date-fns";
 import { Droplet, Brain, Activity, Scale } from "lucide-react";
+import type { Entry } from "../../types";
+
+interface HistoryItemProps {
+  dateKey: string;
+  entry: Entry;
+  onClick: (dateKey: string) => void;
+}
 
 /**
  * Individual history item component
  */
-const HistoryItem = ({ dateKey, entry, onClick }) => {
+const HistoryItem = ({ dateKey, entry, onClick }: HistoryItemProps) => {
   const date = parseISO(dateKey);
   const formattedDate = format(date, "EEEE, MMMM d, yyyy");
 
-  const getFlowColor = (flow) => {
+  const getFlowColor = (flow?: string) => {
     switch (flow?.toLowerCase()) {
       case "spotting":
         return "bg-[var(--flow-spotting)] text-gray-800";
@@ -26,11 +33,11 @@ const HistoryItem = ({ dateKey, entry, onClick }) => {
   return (
     <button
       onClick={() => onClick(dateKey)}
-      className="w-full card hover:border-[var(--color-primary)] transition-all duration-200 text-left mb-3"
+      className="w-full card hover:border-(--color-primary) transition-all duration-200 text-left mb-3"
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <h3 className="font-medium text-[var(--text-primary)] text-sm">
+          <h3 className="font-medium text-(--text-primary) text-sm">
             {formattedDate}
           </h3>
 
@@ -75,13 +82,13 @@ const HistoryItem = ({ dateKey, entry, onClick }) => {
           {/* Mood & Symptom Details */}
           <div className="mt-2 space-y-1">
             {entry.mood && entry.mood.length > 0 && (
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-secondary)">
                 <span className="text-[#fbbf24]">Moods:</span>{" "}
                 {entry.mood.join(", ")}
               </p>
             )}
             {entry.symptoms && entry.symptoms.length > 0 && (
-              <p className="text-xs text-[var(--text-muted)]">
+              <p className="text-xs text-(--text-secondary)">
                 <span className="text-[#06b6d4]">Symptoms:</span>{" "}
                 {entry.symptoms.join(", ")}
               </p>

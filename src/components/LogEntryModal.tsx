@@ -1,7 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { format, parseISO } from "date-fns";
 import { Droplet, Scale, Brain, Activity, Trash2 } from "lucide-react";
 import { Modal, Button, Input, Chip } from "./ui";
+import type { Entry, UserSettings } from "../types";
+
+interface LogEntryModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  dateKey: string | null;
+  entry: Entry | null;
+  userSettings: UserSettings;
+  onSave: (dateKey: string, entry: Partial<Entry>) => void;
+  onDelete: (dateKey: string) => void;
+}
 
 /**
  * Log Entry Modal for adding/editing daily entries
@@ -14,29 +25,25 @@ const LogEntryModal = ({
   userSettings,
   onSave,
   onDelete,
-}) => {
-  const [weight, setWeight] = useState("");
-  const [flow, setFlow] = useState("None");
-  const [selectedMoods, setSelectedMoods] = useState([]);
-  const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+}: LogEntryModalProps) => {
+  const [weight, setWeight] = useState(entry?.weight || "");
+  const [flow, setFlow] = useState(entry?.flow || "None");
+  const [selectedMoods, setSelectedMoods] = useState<string[]>(
+    entry?.mood || [],
+  );
+  const [selectedSymptoms, setSelectedSymptoms] = useState<string[]>(
+    entry?.symptoms || [],
+  );
 
-  // Reset form when modal opens or entry changes
-  useEffect(() => {
-    if (isOpen && dateKey) {
-      setWeight(entry?.weight || "");
-      setFlow(entry?.flow || "None");
-      setSelectedMoods(entry?.mood || []);
-      setSelectedSymptoms(entry?.symptoms || []);
-    }
-  }, [isOpen, dateKey, entry]);
+  // Remove the useEffect that synced props to state
 
-  const handleMoodToggle = (mood) => {
+  const handleMoodToggle = (mood: string) => {
     setSelectedMoods((prev) =>
       prev.includes(mood) ? prev.filter((m) => m !== mood) : [...prev, mood],
     );
   };
 
-  const handleSymptomToggle = (symptom) => {
+  const handleSymptomToggle = (symptom: string) => {
     setSelectedSymptoms((prev) =>
       prev.includes(symptom)
         ? prev.filter((s) => s !== symptom)
@@ -45,6 +52,7 @@ const LogEntryModal = ({
   };
 
   const handleSave = () => {
+    if (!dateKey) return;
     onSave(dateKey, {
       weight: weight.trim(),
       flow,
@@ -55,6 +63,7 @@ const LogEntryModal = ({
   };
 
   const handleDelete = () => {
+    if (!dateKey) return;
     onDelete(dateKey);
     onClose();
   };

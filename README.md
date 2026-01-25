@@ -2,7 +2,7 @@
 
 A local-first, privacy-focused cycle tracking Progressive Web App (PWA).
 
-![Version](https://img.shields.io/badge/version-1.0.2-green)
+![Version](https://img.shields.io/badge/version-1.0.3-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Features
@@ -17,7 +17,7 @@ A local-first, privacy-focused cycle tracking Progressive Web App (PWA).
 
 ## Tech Stack
 
-- **React 19** + **Vite 7**
+- **React 19** + **TypeScript** + **Vite 7**
 - **Tailwind CSS 4** (PostCSS)
 - **Chart.js** + **react-chartjs-2**
 - **Lucide React** (icons)
@@ -47,13 +47,15 @@ npm run dev
 
 ### Available Scripts
 
-| Command                  | Description              |
-| ------------------------ | ------------------------ |
-| `npm run dev`            | Start development server |
-| `npm run build`          | Build for production     |
-| `npm run preview`        | Preview production build |
-| `npm run lint`           | Run ESLint               |
-| `npm run bump <version>` | Bump version number      |
+| Command                  | Description                   |
+| ------------------------ | ----------------------------- |
+| `npm run dev`            | Start development server      |
+| `npm run build`          | Build for production          |
+| `npm run preview`        | Preview production build      |
+| `npm run lint`           | Run ESLint                    |
+| `npm run type-check`     | Run TypeScript compiler check |
+| `npm run check`          | Run type-check & lint         |
+| `npm run bump <version>` | Bump version number           |
 
 ## Deployment
 
@@ -123,7 +125,7 @@ node scripts/bump-version.js 1.1.0
 This updates:
 
 - `package.json` → `version`
-- `src/App.jsx` → `APP_VERSION`
+- `src/App.tsx` → `APP_VERSION`
 
 ## Project Structure
 
@@ -132,17 +134,17 @@ src/
 ├── components/
 │   ├── layout/          # Header, BottomNav
 │   ├── ui/              # Button, Card, Modal, Input, Chip, Toast
-│   └── LogEntryModal.jsx
+│   └── LogEntryModal.tsx
 ├── features/
 │   ├── calendar/        # CalendarGrid, CalendarLogic
 │   ├── weight/          # WeightChart, WeightStats
 │   ├── history/         # HistoryList, HistoryItem
 │   └── settings/        # ConfigForm, DataManagement
 ├── hooks/
-│   ├── useLocalStorage.js  # Data persistence
-│   └── usePWAUpdate.js     # PWA update notifications
-├── App.jsx              # Main app component
-├── main.jsx             # Entry point
+│   ├── useLocalStorage.ts  # Data persistence
+│   └── usePWAUpdate.ts     # PWA update notifications
+├── App.tsx              # Main app component
+├── main.tsx             # Entry point
 └── index.css            # Tailwind + custom styles
 ```
 

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, type ChangeEvent } from "react";
 import {
   Download,
   Upload,
@@ -7,14 +7,32 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { Card, Button, Modal } from "../../components/ui";
+import type { ImportResult } from "../../types";
+
+interface DataManagementProps {
+  onExport: () => void;
+  onImport: (jsonData: string) => ImportResult;
+  onClear: () => void;
+  entryCount: number;
+}
+
+interface ImportStatus {
+  type: "success" | "error";
+  message: string;
+}
 
 /**
  * Data Management component for import/export/clear operations
  */
-const DataManagement = ({ onExport, onImport, onClear, entryCount }) => {
+const DataManagement = ({
+  onExport,
+  onImport,
+  onClear,
+  entryCount,
+}: DataManagementProps) => {
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [importStatus, setImportStatus] = useState(null);
-  const fileInputRef = useRef(null);
+  const [importStatus, setImportStatus] = useState<ImportStatus | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleExport = () => {
     onExport();
@@ -29,7 +47,7 @@ const DataManagement = ({ onExport, onImport, onClear, entryCount }) => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (e) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -59,7 +77,7 @@ const DataManagement = ({ onExport, onImport, onClear, entryCount }) => {
       console.error("File read error:", error);
       setImportStatus({
         type: "error",
-        message: `Failed to read file: ${error.message}`,
+        message: `Failed to read file: ${(error as Error).message}`,
       });
     }
 

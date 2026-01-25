@@ -1,10 +1,22 @@
-import { Calendar, Clock, Settings } from "lucide-react";
+import { Calendar, Clock, Settings, type LucideIcon } from "lucide-react";
+import type { ViewType } from "../../types";
+
+interface NavItem {
+  id: ViewType;
+  label: string;
+  icon: LucideIcon;
+}
+
+interface BottomNavProps {
+  activeView: ViewType;
+  onViewChange: (view: ViewType) => void;
+}
 
 /**
  * Bottom navigation component for view switching
  */
-const BottomNav = ({ activeView, onViewChange }) => {
-  const navItems = [
+const BottomNav = ({ activeView, onViewChange }: BottomNavProps) => {
+  const navItems: NavItem[] = [
     { id: "history", label: "History", icon: Clock },
     { id: "calendar", label: "Calendar", icon: Calendar },
     { id: "settings", label: "Settings", icon: Settings },

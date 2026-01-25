@@ -8,13 +8,24 @@ import {
   getFlowLevel,
   isToday,
 } from "./CalendarLogic";
+import type { EntriesMap } from "../../types";
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+interface CalendarGridProps {
+  entries: EntriesMap;
+  averageCycleLength: number;
+  onDayClick: (date: string) => void;
+}
 
 /**
  * Calendar Grid component showing monthly view with flow indicators
  */
-const CalendarGrid = ({ entries, averageCycleLength, onDayClick }) => {
+const CalendarGrid = ({
+  entries,
+  averageCycleLength,
+  onDayClick,
+}: CalendarGridProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   const days = useMemo(() => getCalendarDays(currentMonth), [currentMonth]);
@@ -32,7 +43,7 @@ const CalendarGrid = ({ entries, averageCycleLength, onDayClick }) => {
     setCurrentMonth((prev) => addMonths(prev, 1));
   };
 
-  const handleDayClick = (day) => {
+  const handleDayClick = (day: Date | null) => {
     if (day) {
       onDayClick(format(day, "yyyy-MM-dd"));
     }
@@ -84,7 +95,7 @@ const CalendarGrid = ({ entries, averageCycleLength, onDayClick }) => {
 
           const dateKey = format(day, "yyyy-MM-dd");
           const entry = entries[dateKey];
-          const flowLevel = entry ? getFlowLevel(entry.flow) : null;
+          const flowLevel = getFlowLevel(entry?.flow);
           const indicators = getEntryIndicators(entry);
           const isPredicted = predictedDates.includes(dateKey) && !flowLevel;
           const isTodayDate = isToday(day);
@@ -99,7 +110,7 @@ const CalendarGrid = ({ entries, averageCycleLength, onDayClick }) => {
                 ${flowLevel ? `has-flow flow-${flowLevel}` : ""}
                 ${isPredicted ? "predicted" : ""}
               `}
-              aria-label={`${format(day, "MMMM d, yyyy")}${flowLevel ? `, ${entry.flow} flow` : ""}`}
+              aria-label={`${format(day, "MMMM d, yyyy")}${flowLevel ? `, ${entry?.flow} flow` : ""}`}
             >
               <span className="text-sm">{format(day, "d")}</span>
 

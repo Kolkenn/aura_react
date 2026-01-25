@@ -11,19 +11,20 @@ import {
   parseISO,
   differenceInDays,
 } from "date-fns";
+import type { EntriesMap, Entry } from "../../types";
 
 /**
  * Calculate predicted period start dates based on last flow entry and cycle length
  */
 export function calculatePredictedDates(
-  entries,
-  averageCycleLength,
-  monthDate,
-) {
+  entries: EntriesMap,
+  averageCycleLength: number,
+  monthDate: Date,
+): string[] {
   const flowEntries = Object.entries(entries)
     .filter(([_, entry]) => entry.flow && entry.flow !== "None")
     .map(([date]) => parseISO(date))
-    .sort((a, b) => b - a);
+    .sort((a, b) => b.getTime() - a.getTime());
 
   if (flowEntries.length === 0) return [];
 
@@ -39,7 +40,7 @@ export function calculatePredictedDates(
   }
 
   // Calculate predicted dates
-  const predictions = [];
+  const predictions: string[] = [];
   const monthStart = startOfMonth(monthDate);
   const monthEnd = endOfMonth(monthDate);
 
@@ -62,14 +63,14 @@ export function calculatePredictedDates(
 /**
  * Get days for calendar grid including padding for week alignment
  */
-export function getCalendarDays(monthDate) {
+export function getCalendarDays(monthDate: Date): (Date | null)[] {
   const start = startOfMonth(monthDate);
   const end = endOfMonth(monthDate);
   const days = eachDayOfInterval({ start, end });
 
   // Add padding for days before the first of the month
   const startPadding = getDay(start);
-  const paddedDays = [];
+  const paddedDays: (Date | null)[] = [];
 
   for (let i = 0; i < startPadding; i++) {
     paddedDays.push(null);
@@ -78,23 +79,29 @@ export function getCalendarDays(monthDate) {
   return [...paddedDays, ...days];
 }
 
+interface EntryIndicators {
+  hasMood: boolean;
+  hasWeight: boolean;
+  hasSymptoms: boolean;
+}
+
 /**
  * Check if a date has specific entry types
  */
-export function getEntryIndicators(entry) {
+export function getEntryIndicators(entry?: Entry): EntryIndicators {
   if (!entry) return { hasMood: false, hasWeight: false, hasSymptoms: false };
 
   return {
-    hasMood: entry.mood && entry.mood.length > 0,
-    hasWeight: entry.weight && entry.weight !== "",
-    hasSymptoms: entry.symptoms && entry.symptoms.length > 0,
+    hasMood: !!(entry.mood && entry.mood.length > 0),
+    hasWeight: !!(entry.weight && entry.weight !== ""),
+    hasSymptoms: !!(entry.symptoms && entry.symptoms.length > 0),
   };
 }
 
 /**
  * Get the flow level for CSS class
  */
-export function getFlowLevel(flow) {
+export function getFlowLevel(flow?: string): string | null {
   if (!flow || flow === "None") return null;
   return flow.toLowerCase().replace(" ", "-");
 }

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import type { UsePWAUpdateReturn } from "../types";
 
 const OFFLINE_READY_SHOWN_KEY = "aura_offline_ready_shown";
 const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
@@ -11,20 +12,21 @@ const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
  * - Only shows offline ready toast once per installation
  * - Tracks PWA installation status
  */
-export function usePWAUpdate() {
+export function usePWAUpdate(): UsePWAUpdateReturn {
   const [offlineReady, setOfflineReady] = useState(false);
   const [needRefresh, setNeedRefresh] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [hasServiceWorker, setHasServiceWorker] = useState(false);
-  const registrationRef = useRef(null);
-  const intervalRef = useRef(null);
+  const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     // Check if running as installed PWA (standalone mode)
     const checkInstalled = () => {
       const isStandalone =
         window.matchMedia("(display-mode: standalone)").matches ||
-        window.navigator.standalone === true ||
+        (navigator as Navigator & { standalone?: boolean }).standalone ===
+          true ||
         document.referrer.includes("android-app://");
       setIsInstalled(isStandalone);
     };

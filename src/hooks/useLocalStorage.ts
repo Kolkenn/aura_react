@@ -1,8 +1,16 @@
 import { useState, useCallback, useEffect } from "react";
+import type {
+  Entry,
+  EntriesMap,
+  UserSettings,
+  StorageData,
+  UseLocalStorageReturn,
+  ImportResult,
+} from "../types";
 
 const STORAGE_KEY = "cycle_tracker_mvp_data";
 
-const DEFAULT_DATA = {
+const DEFAULT_DATA: StorageData = {
   userSettings: {
     averageCycleLength: 28,
     flowOptions: ["None", "Spotting", "Light", "Medium", "Heavy"],
@@ -35,12 +43,12 @@ const DEFAULT_DATA = {
  * Custom hook for managing cycle tracker data in localStorage
  * Maintains 100% compatibility with the legacy localStorage schema
  */
-export function useLocalStorage() {
-  const [data, setData] = useState(() => {
+export function useLocalStorage(): UseLocalStorageReturn {
+  const [data, setData] = useState<StorageData>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        const parsed = JSON.parse(stored);
+        const parsed = JSON.parse(stored) as Partial<StorageData>;
         // Merge with defaults to ensure all fields exist
         return {
           userSettings: {
@@ -68,60 +76,63 @@ export function useLocalStorage() {
 
   // Get entry for a specific date
   const getEntry = useCallback(
-    (dateKey) => {
+    (dateKey: string): Entry | null => {
       return data.entries[dateKey] || null;
     },
     [data.entries],
   );
 
   // Get all entries
-  const getAllEntries = useCallback(() => {
+  const getAllEntries = useCallback((): EntriesMap => {
     return data.entries;
   }, [data.entries]);
 
   // Upsert (create or update) an entry
-  const saveEntry = useCallback((dateKey, entryData) => {
-    setData((prev) => {
-      const existingEntry = prev.entries[dateKey] || {};
-      const updatedEntry = { ...existingEntry, ...entryData };
+  const saveEntry = useCallback(
+    (dateKey: string, entryData: Partial<Entry>) => {
+      setData((prev) => {
+        const existingEntry = prev.entries[dateKey] || {};
+        const updatedEntry: Entry = { ...existingEntry, ...entryData };
 
-      // Remove empty fields
-      Object.keys(updatedEntry).forEach((key) => {
-        const value = updatedEntry[key];
-        if (value === "" || value === null || value === undefined) {
-          delete updatedEntry[key];
-        }
-        if (Array.isArray(value) && value.length === 0) {
-          delete updatedEntry[key];
-        }
-        if (key === "flow" && value === "None") {
-          delete updatedEntry[key];
-        }
-      });
+        // Remove empty fields
+        (Object.keys(updatedEntry) as Array<keyof Entry>).forEach((key) => {
+          const value = updatedEntry[key];
+          if (value === "" || value === null || value === undefined) {
+            delete updatedEntry[key];
+          }
+          if (Array.isArray(value) && value.length === 0) {
+            delete updatedEntry[key];
+          }
+          if (key === "flow" && value === "None") {
+            delete updatedEntry[key];
+          }
+        });
 
-      // If entry is empty, remove it entirely
-      if (Object.keys(updatedEntry).length === 0) {
-        const restEntries = Object.fromEntries(
-          Object.entries(prev.entries).filter(([key]) => key !== dateKey),
-        );
+        // If entry is empty, remove it entirely
+        if (Object.keys(updatedEntry).length === 0) {
+          const restEntries = Object.fromEntries(
+            Object.entries(prev.entries).filter(([key]) => key !== dateKey),
+          );
+          return {
+            ...prev,
+            entries: restEntries,
+          };
+        }
+
         return {
           ...prev,
-          entries: restEntries,
+          entries: {
+            ...prev.entries,
+            [dateKey]: updatedEntry,
+          },
         };
-      }
-
-      return {
-        ...prev,
-        entries: {
-          ...prev.entries,
-          [dateKey]: updatedEntry,
-        },
-      };
-    });
-  }, []);
+      });
+    },
+    [],
+  );
 
   // Delete an entry
-  const deleteEntry = useCallback((dateKey) => {
+  const deleteEntry = useCallback((dateKey: string) => {
     setData((prev) => {
       const restEntries = Object.fromEntries(
         Object.entries(prev.entries).filter(([key]) => key !== dateKey),
@@ -134,7 +145,7 @@ export function useLocalStorage() {
   }, []);
 
   // Update user settings
-  const updateSettings = useCallback((newSettings) => {
+  const updateSettings = useCallback((newSettings: Partial<UserSettings>) => {
     setData((prev) => ({
       ...prev,
       userSettings: {
@@ -145,32 +156,38 @@ export function useLocalStorage() {
   }, []);
 
   // Add a custom option (mood or symptom)
-  const addCustomOption = useCallback((type, option) => {
-    const key = type === "mood" ? "moodOptions" : "symptomOptions";
-    setData((prev) => {
-      const currentOptions = prev.userSettings[key] || [];
-      if (currentOptions.includes(option)) return prev;
-      return {
+  const addCustomOption = useCallback(
+    (type: "mood" | "symptom", option: string) => {
+      const key = type === "mood" ? "moodOptions" : "symptomOptions";
+      setData((prev) => {
+        const currentOptions = prev.userSettings[key] || [];
+        if (currentOptions.includes(option)) return prev;
+        return {
+          ...prev,
+          userSettings: {
+            ...prev.userSettings,
+            [key]: [...currentOptions, option],
+          },
+        };
+      });
+    },
+    [],
+  );
+
+  // Remove a custom option
+  const removeCustomOption = useCallback(
+    (type: "mood" | "symptom", option: string) => {
+      const key = type === "mood" ? "moodOptions" : "symptomOptions";
+      setData((prev) => ({
         ...prev,
         userSettings: {
           ...prev.userSettings,
-          [key]: [...currentOptions, option],
+          [key]: prev.userSettings[key].filter((o) => o !== option),
         },
-      };
-    });
-  }, []);
-
-  // Remove a custom option
-  const removeCustomOption = useCallback((type, option) => {
-    const key = type === "mood" ? "moodOptions" : "symptomOptions";
-    setData((prev) => ({
-      ...prev,
-      userSettings: {
-        ...prev.userSettings,
-        [key]: prev.userSettings[key].filter((o) => o !== option),
-      },
-    }));
-  }, []);
+      }));
+    },
+    [],
+  );
 
   // Export data as JSON
   const exportData = useCallback(() => {
@@ -188,10 +205,10 @@ export function useLocalStorage() {
   }, [data]);
 
   // Import data from JSON with legacy format support
-  const importData = useCallback((jsonData) => {
+  const importData = useCallback((jsonData: string | object): ImportResult => {
     try {
       // Parse if string
-      let parsed;
+      let parsed: unknown;
       try {
         parsed = typeof jsonData === "string" ? JSON.parse(jsonData) : jsonData;
       } catch (parseError) {
@@ -207,26 +224,28 @@ export function useLocalStorage() {
         return { success: false, error: "Invalid data: expected an object" };
       }
 
-      console.log("Importing data structure:", Object.keys(parsed));
+      const parsedObj = parsed as Record<string, unknown>;
+      console.log("Importing data structure:", Object.keys(parsedObj));
 
       // Check for different possible data structures
-      let entries = null;
-      let userSettings = null;
+      let entries: EntriesMap | null = null;
+      let userSettings: Partial<UserSettings> | null = null;
 
       // Format 1: Direct { entries: {...}, userSettings: {...} }
-      if (parsed.entries && typeof parsed.entries === "object") {
-        entries = parsed.entries;
-        userSettings = parsed.userSettings || null;
+      if (parsedObj.entries && typeof parsedObj.entries === "object") {
+        entries = parsedObj.entries as EntriesMap;
+        userSettings =
+          (parsedObj.userSettings as Partial<UserSettings>) || null;
       }
       // Format 2: Just entries at root level (each key is a date)
-      else if (Object.keys(parsed).length > 0) {
-        const keys = Object.keys(parsed);
+      else if (Object.keys(parsedObj).length > 0) {
+        const keys = Object.keys(parsedObj);
         const looksLikeDates = keys.some((key) =>
           /^\d{4}-\d{2}-\d{2}$/.test(key),
         );
 
         if (looksLikeDates) {
-          entries = parsed;
+          entries = parsedObj as EntriesMap;
           console.log("Detected legacy format: entries at root level");
         }
       }
@@ -243,13 +262,13 @@ export function useLocalStorage() {
       // ============ LEGACY FORMAT MIGRATION ============
 
       // Helper to capitalize first letter
-      const toTitleCase = (str) => {
+      const toTitleCase = (str: string): string => {
         if (!str || typeof str !== "string") return str;
         return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
       };
 
       // Migrate userSettings if it's in legacy format (object arrays)
-      let migratedSettings = { ...DEFAULT_DATA.userSettings };
+      const migratedSettings: UserSettings = { ...DEFAULT_DATA.userSettings };
 
       if (userSettings) {
         // Preserve averageCycleLength
@@ -260,53 +279,54 @@ export function useLocalStorage() {
         // Migrate flowOptions from [{value, label, icon}] to ["Label"]
         if (Array.isArray(userSettings.flowOptions)) {
           const firstFlow = userSettings.flowOptions[0];
-          if (firstFlow && typeof firstFlow === "object" && firstFlow.label) {
+          if (
+            firstFlow &&
+            typeof firstFlow === "object" &&
+            (firstFlow as unknown as { label?: string }).label
+          ) {
             // Legacy format - extract labels
             migratedSettings.flowOptions = [
               "None",
-              ...userSettings.flowOptions.map((opt) => opt.label),
+              ...userSettings.flowOptions.map(
+                (opt) => (opt as unknown as { label: string }).label,
+              ),
             ];
             console.log("Migrated flowOptions from object format");
           } else if (typeof firstFlow === "string") {
             // Already string format
-            migratedSettings.flowOptions = userSettings.flowOptions;
+            migratedSettings.flowOptions = userSettings.flowOptions as string[];
           }
         }
 
         // Migrate moodOptions from [{value, label, icon}] to ["Label"]
         if (Array.isArray(userSettings.moodOptions)) {
           const firstMood = userSettings.moodOptions[0];
-          if (firstMood && typeof firstMood === "object" && firstMood.label) {
+          if (
+            firstMood &&
+            typeof firstMood === "object" &&
+            (firstMood as unknown as { label?: string }).label
+          ) {
             // Legacy format - extract labels
             migratedSettings.moodOptions = userSettings.moodOptions.map(
-              (opt) => opt.label,
+              (opt) => (opt as unknown as { label: string }).label,
             );
             console.log("Migrated moodOptions from object format");
           } else if (typeof firstMood === "string") {
             // Already string format
-            migratedSettings.moodOptions = userSettings.moodOptions;
+            migratedSettings.moodOptions = userSettings.moodOptions as string[];
           }
         }
 
         // symptomOptions is already string array in legacy format
         if (Array.isArray(userSettings.symptomOptions)) {
-          migratedSettings.symptomOptions = userSettings.symptomOptions;
+          migratedSettings.symptomOptions =
+            userSettings.symptomOptions as string[];
         }
       }
 
       // Build flow value mapping from legacy (lowercase) to new (Title Case)
-      const buildFlowMapping = () => {
-        const mapping = {};
-        if (
-          userSettings?.flowOptions &&
-          Array.isArray(userSettings.flowOptions)
-        ) {
-          userSettings.flowOptions.forEach((opt) => {
-            if (opt && typeof opt === "object" && opt.value && opt.label) {
-              mapping[opt.value] = opt.label;
-            }
-          });
-        }
+      const buildFlowMapping = (): Record<string, string> => {
+        const mapping: Record<string, string> = {};
         // Add common defaults
         mapping["spotting"] = "Spotting";
         mapping["light"] = "Light";
@@ -319,18 +339,8 @@ export function useLocalStorage() {
       };
 
       // Build mood value mapping from legacy (lowercase) to new (Title Case)
-      const buildMoodMapping = () => {
-        const mapping = {};
-        if (
-          userSettings?.moodOptions &&
-          Array.isArray(userSettings.moodOptions)
-        ) {
-          userSettings.moodOptions.forEach((opt) => {
-            if (opt && typeof opt === "object" && opt.value && opt.label) {
-              mapping[opt.value] = opt.label;
-            }
-          });
-        }
+      const buildMoodMapping = (): Record<string, string> => {
+        const mapping: Record<string, string> = {};
         // Add common defaults
         mapping["happy"] = "Happy";
         mapping["neutral"] = "Neutral";
@@ -351,13 +361,13 @@ export function useLocalStorage() {
       const moodMapping = buildMoodMapping();
 
       // Migrate entries
-      const migratedEntries = {};
+      const migratedEntries: EntriesMap = {};
       let migrationCount = 0;
 
       Object.entries(entries).forEach(([dateKey, entry]) => {
         if (!entry || typeof entry !== "object") return;
 
-        const migratedEntry = { ...entry };
+        const migratedEntry: Entry = { ...entry };
 
         // Migrate flow value (lowercase -> Title Case)
         if (entry.flow && typeof entry.flow === "string") {
@@ -395,7 +405,7 @@ export function useLocalStorage() {
       }
 
       // Build the final imported data
-      const importedData = {
+      const importedData: StorageData = {
         userSettings: migratedSettings,
         entries: migratedEntries,
       };
@@ -408,7 +418,10 @@ export function useLocalStorage() {
       return { success: true, entryCount: Object.keys(migratedEntries).length };
     } catch (error) {
       console.error("Error importing data:", error);
-      return { success: false, error: error.message || "Unknown import error" };
+      return {
+        success: false,
+        error: (error as Error).message || "Unknown import error",
+      };
     }
   }, []);
 

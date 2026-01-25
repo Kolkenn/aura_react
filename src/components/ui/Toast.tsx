@@ -1,12 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import {
   X,
   RefreshCw,
   Wifi,
-  CheckCircle,
   AlertCircle,
   Info,
+  type LucideProps,
 } from "lucide-react";
+import type {
+  Toast as ToastType,
+  ToastType as ToastVariant,
+} from "../../types";
+
+interface ToastProps {
+  id: string;
+  message: string;
+  type?: ToastVariant;
+  icon?: ComponentType<LucideProps>;
+  action?: () => void;
+  actionLabel?: string;
+  onDismiss?: (id: string) => void;
+  autoDismiss?: boolean;
+  autoDismissTime?: number;
+}
 
 /**
  * Individual Toast component with optional auto-dismiss timer
@@ -14,14 +30,14 @@ import {
 const Toast = ({
   id,
   message,
-  type = "info", // info, success, warning, update
+  type = "info",
   icon: CustomIcon,
   action,
   actionLabel = "Action",
   onDismiss,
   autoDismiss = false,
   autoDismissTime = 4000,
-}) => {
+}: ToastProps) => {
   const [progress, setProgress] = useState(100);
   const [isExiting, setIsExiting] = useState(false);
 
@@ -44,6 +60,7 @@ const Toast = ({
 
     const interval = setInterval(updateProgress, 50);
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [autoDismiss, autoDismissTime]);
 
   const handleDismiss = () => {
@@ -53,40 +70,40 @@ const Toast = ({
     }, 200);
   };
 
-  const getIcon = () => {
+  const getIcon = (): ComponentType<LucideProps> => {
     if (CustomIcon) return CustomIcon;
     switch (type) {
       case "success":
         return Wifi;
       case "update":
         return RefreshCw;
-      case "warning":
+      case "error":
         return AlertCircle;
       default:
         return Info;
     }
   };
 
-  const getIconColor = () => {
+  const getIconColor = (): string => {
     switch (type) {
       case "success":
         return "text-green-500";
       case "update":
         return "text-pink-500";
-      case "warning":
+      case "error":
         return "text-amber-500";
       default:
         return "text-blue-500";
     }
   };
 
-  const getProgressColor = () => {
+  const getProgressColor = (): string => {
     switch (type) {
       case "success":
         return "bg-green-500";
       case "update":
         return "bg-pink-500";
-      case "warning":
+      case "error":
         return "bg-amber-500";
       default:
         return "bg-blue-500";
@@ -139,10 +156,15 @@ const Toast = ({
   );
 };
 
+interface ToastContainerProps {
+  toasts: ToastType[];
+  onDismiss: (id: string) => void;
+}
+
 /**
  * Toast Container - manages stacking of multiple toasts
  */
-const ToastContainer = ({ toasts, onDismiss }) => {
+const ToastContainer = ({ toasts, onDismiss }: ToastContainerProps) => {
   return (
     <div className="fixed bottom-24 left-4 right-4 z-50 flex flex-col gap-2 pointer-events-none">
       {toasts.map((toast) => (

@@ -131,8 +131,8 @@ async function main() {
     process.exit(1);
   }
 
-  // Update App.jsx
-  const appPath = join(rootDir, "src", "App.jsx");
+  // Update App.tsx
+  const appPath = join(rootDir, "src", "App.tsx");
   try {
     let appContent = readFileSync(appPath, "utf-8");
 
@@ -146,12 +146,12 @@ async function main() {
         `const APP_VERSION = "${newVersion}";`,
       );
       writeFileSync(appPath, appContent);
-      updates.push(`✅ App.jsx: ${oldVersion} → ${newVersion}`);
+      updates.push(`✅ App.tsx: ${oldVersion} → ${newVersion}`);
     } else {
-      updates.push("⚠️  App.jsx: APP_VERSION not found");
+      updates.push("⚠️  App.tsx: APP_VERSION not found");
     }
   } catch (error) {
-    console.error("❌ Failed to update App.jsx:", error.message);
+    console.error("❌ Failed to update App.tsx:", error.message);
     process.exit(1);
   }
 

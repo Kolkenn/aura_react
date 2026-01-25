@@ -1,3 +1,11 @@
+import type { ButtonHTMLAttributes, ReactNode, CSSProperties } from "react";
+
+interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children?: ReactNode;
+  active?: boolean;
+  color?: string;
+}
+
 /**
  * Chip component for selectable pills/tags
  */
@@ -8,8 +16,8 @@ const Chip = ({
   className = "",
   color,
   ...props
-}) => {
-  const colorStyles = color
+}: ChipProps) => {
+  const colorStyles: CSSProperties = color
     ? {
         background: active ? color : "var(--bg-tertiary)",
         borderColor: active ? color : "var(--border-color)",
