@@ -24,7 +24,7 @@ import { ConfigForm, DataManagement } from "./features/settings";
 import LogEntryModal from "./components/LogEntryModal";
 
 // App Version
-const APP_VERSION = "1.0.5";
+const APP_VERSION = "1.0.6";
 
 function App() {
   const [activeView, setActiveView] = useState<ViewType>("calendar");
@@ -204,6 +204,34 @@ function App() {
                 )}
               </div>
 
+              {/* Update Checker */}
+              <div className="mt-3 pt-3 border-t border-base-content/10">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="text-base-content/60">Updates:</span>
+                    {needRefresh ? (
+                      <span className="flex items-center gap-1 text-warning">
+                        Update available
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-success">
+                        <CheckCircle size={14} />
+                        Up to date
+                      </span>
+                    )}
+                  </div>
+                  {needRefresh && (
+                    <button
+                      onClick={handleUpdate}
+                      className="btn btn-sm btn-primary"
+                    >
+                      Update Now
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Privacy */}
               <div className="mt-3 pt-3 border-t border-base-content/10">
                 <p className="text-xs text-base-content/60">
                   🔒 Your data is stored locally on this device. No data is sent
