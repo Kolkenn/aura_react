@@ -74,8 +74,30 @@ const LogEntryModal = ({
 
   const hasExistingData = entry && Object.keys(entry).length > 0;
 
+  const footerActions = (
+    <div className="flex gap-3">
+      {hasExistingData && (
+        <Button onClick={handleDelete} variant="danger" className="flex-1">
+          <Trash2 size={16} />
+        </Button>
+      )}
+      <Button onClick={onClose} variant="secondary" className="flex-1">
+        Cancel
+      </Button>
+      <Button onClick={handleSave} variant="primary" className="flex-1">
+        Save Entry
+      </Button>
+    </div>
+  );
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={formattedDate} size="lg">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={formattedDate}
+      size="lg"
+      footer={footerActions}
+    >
       <div className="space-y-6">
         {/* Weight Input */}
         <div>
@@ -176,25 +198,6 @@ const LogEntryModal = ({
               </Chip>
             ))}
           </div>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-3 pt-2">
-          {hasExistingData && (
-            <Button
-              onClick={handleDelete}
-              variant="danger"
-              className="shrink-0"
-            >
-              <Trash2 size={16} />
-            </Button>
-          )}
-          <Button onClick={onClose} variant="secondary" className="shrink-0">
-            Cancel
-          </Button>
-          <Button onClick={handleSave} variant="primary" className="shrink-0">
-            Save Entry
-          </Button>
         </div>
       </div>
     </Modal>

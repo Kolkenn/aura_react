@@ -1,7 +1,7 @@
 {
   "name": "aura",
   "private": true,
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,8 @@
     "check": "npm run type-check && npm run lint",
     "preview": "vite preview",
     "preview-host": "vite preview --host",
-    "bump": "node scripts/bump-version.js"
+    "bump": "node scripts/bump-version.js",
+    "lock": "npm install --package-lock-only"
   },
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",

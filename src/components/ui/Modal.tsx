@@ -8,6 +8,7 @@ interface ModalProps {
   onClose: () => void;
   title?: string;
   children?: ReactNode;
+  footer?: ReactNode;
   showCloseButton?: boolean;
   size?: ModalSize;
 }
@@ -20,6 +21,7 @@ const Modal = ({
   onClose,
   title,
   children,
+  footer,
   showCloseButton = true,
   size = "md",
 }: ModalProps) => {
@@ -57,11 +59,11 @@ const Modal = ({
   return (
     <div className={`modal ${isOpen ? "modal-open" : ""}`} role="dialog">
       <div
-        className={`modal-box ${sizeClasses[size] || "max-w-md"} relative flex flex-col max-h-[90vh] p-0`}
+        className={`modal-box ${sizeClasses[size] || "max-w-md"} relative flex flex-col max-h-[90vh] p-0 overflow-hidden`}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="flex items-center justify-between p-5 border-b border-base-200">
+          <div className="flex items-center justify-between p-5 border-b border-base-200 shrink-0">
             {title && <h2 className="text-lg font-bold">{title}</h2>}
             {showCloseButton && (
               <button
@@ -76,7 +78,12 @@ const Modal = ({
         )}
 
         {/* Content */}
-        <div className="p-5 overflow-y-auto flex-1">{children}</div>
+        <div className="p-5 overflow-y-auto flex-1 min-h-0">{children}</div>
+
+        {/* Footer (always visible) */}
+        {footer && (
+          <div className="p-5 border-t border-base-200 shrink-0">{footer}</div>
+        )}
       </div>
       <form method="dialog" className="modal-backdrop">
         <button onClick={onClose}>close</button>

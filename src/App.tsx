@@ -24,7 +24,7 @@ import { ConfigForm, DataManagement } from "./features/settings";
 import LogEntryModal from "./components/LogEntryModal";
 
 // App Version
-const APP_VERSION = "1.0.6";
+const APP_VERSION = "1.0.7";
 
 function App() {
   const [activeView, setActiveView] = useState<ViewType>("calendar");
@@ -266,7 +266,7 @@ function App() {
   return (
     <div className="min-h-screen flex justify-center bg-base-200">
       {/* Desktop Container */}
-      <div className="flex flex-col min-h-screen w-full max-w-[768px] bg-base-100 shadow-xl">
+      <div className="flex flex-col min-h-screen w-full max-w-3xl bg-base-100 shadow-xl">
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto px-3 py-3 pb-18">
           {renderView()}
