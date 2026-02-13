@@ -2,7 +2,7 @@
 
 A local-first, privacy-focused cycle tracking Progressive Web App (PWA).
 
-![Version](https://img.shields.io/badge/version-1.0.8-green)
+![Version](https://img.shields.io/badge/version-1.0.9-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Features
@@ -47,15 +47,16 @@ npm run dev
 
 ### Available Scripts
 
-| Command                  | Description                   |
-| ------------------------ | ----------------------------- |
-| `npm run dev`            | Start development server      |
-| `npm run build`          | Build for production          |
-| `npm run preview`        | Preview production build      |
-| `npm run lint`           | Run ESLint                    |
-| `npm run type-check`     | Run TypeScript compiler check |
-| `npm run check`          | Run type-check & lint         |
-| `npm run bump <version>` | Bump version number           |
+| Command                  | Description                                                 |
+| ------------------------ | ----------------------------------------------------------- |
+| `npm run dev`            | Start development server                                    |
+| `npm run build`          | Build for production                                        |
+| `npm run preview`        | Preview production build                                    |
+| `npm run lint`           | Run ESLint                                                  |
+| `npm run type-check`     | Run TypeScript compiler check                               |
+| `npm run check`          | Run type-check & lint                                       |
+| `npm run bump <version>` | Bump version number in package.json, App.tsx, and README.md |
+| `npm run lock`           | Lock dependencies and update package-lock.json              |
 
 ## Deployment
 

@@ -12,14 +12,22 @@ const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
  * - Only shows offline ready toast once per installation
  * - Tracks PWA installation status
  */
+// Extended BeforeInstallPromptEvent type (not in standard TS lib)
+interface BeforeInstallPromptEvent extends Event {
+  prompt(): Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
 export function usePWAUpdate(): UsePWAUpdateReturn {
   const [offlineReady, setOfflineReady] = useState(false);
   const [needRefresh, setNeedRefresh] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [hasServiceWorker, setHasServiceWorker] = useState(false);
+  const [canInstall, setCanInstall] = useState(false);
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const deferredPromptRef = useRef<BeforeInstallPromptEvent | null>(null);
 
   useEffect(() => {
     // Check if running as installed PWA (standalone mode)
@@ -37,6 +45,22 @@ export function usePWAUpdate(): UsePWAUpdateReturn {
     // Listen for display mode changes
     const mediaQuery = window.matchMedia("(display-mode: standalone)");
     mediaQuery.addEventListener("change", checkInstalled);
+
+    // Capture the beforeinstallprompt event for programmatic install
+    const handleBeforeInstallPrompt = (e: Event) => {
+      e.preventDefault();
+      deferredPromptRef.current = e as BeforeInstallPromptEvent;
+      setCanInstall(true);
+    };
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+
+    // Listen for successful app installation
+    const handleAppInstalled = () => {
+      deferredPromptRef.current = null;
+      setCanInstall(false);
+      setIsInstalled(true);
+    };
+    window.addEventListener("appinstalled", handleAppInstalled);
 
     // Only initialize if service worker is supported
     if (!("serviceWorker" in navigator)) return;
@@ -114,6 +138,11 @@ export function usePWAUpdate(): UsePWAUpdateReturn {
         handleControllerChange,
       );
       mediaQuery.removeEventListener("change", checkInstalled);
+      window.removeEventListener(
+        "beforeinstallprompt",
+        handleBeforeInstallPrompt,
+      );
+      window.removeEventListener("appinstalled", handleAppInstalled);
     };
   }, []);
 
@@ -132,13 +161,25 @@ export function usePWAUpdate(): UsePWAUpdateReturn {
     setOfflineReady(false);
   }, []);
 
+  const installApp = useCallback(async () => {
+    if (!deferredPromptRef.current) return;
+    await deferredPromptRef.current.prompt();
+    const { outcome } = await deferredPromptRef.current.userChoice;
+    if (outcome === "accepted") {
+      deferredPromptRef.current = null;
+      setCanInstall(false);
+    }
+  }, []);
+
   return {
     offlineReady,
     needRefresh,
     updateAvailable,
     isInstalled,
     hasServiceWorker,
+    canInstall,
     handleUpdate,
+    installApp,
     dismissToast,
     dismissOfflineReady,
   };

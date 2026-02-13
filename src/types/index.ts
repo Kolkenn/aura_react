@@ -119,7 +119,9 @@ export interface UsePWAUpdateReturn {
   updateAvailable: boolean; // True if an update is available (persists after toast dismissal)
   isInstalled: boolean; // True if the app is installed
   hasServiceWorker: boolean; // True if the app has a service worker
+  canInstall: boolean; // True if the app can be installed via prompt
   handleUpdate: () => void; // Updates the app
+  installApp: () => Promise<void>; // Triggers the native install prompt
   dismissToast: () => void; // Dismisses the toast
   dismissOfflineReady: () => void;
 }

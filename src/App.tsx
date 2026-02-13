@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Wifi, WifiOff, CheckCircle } from "lucide-react";
+import { Wifi, WifiOff, CheckCircle, Download } from "lucide-react";
 
 // Types
 import type { Toast, ViewType, Entry } from "./types";
@@ -24,7 +24,7 @@ import { ConfigForm, DataManagement } from "./features/settings";
 import LogEntryModal from "./components/LogEntryModal";
 
 // App Version
-const APP_VERSION = "1.0.8";
+const APP_VERSION = "1.0.9";
 
 function App() {
   const [activeView, setActiveView] = useState<ViewType>("calendar");
@@ -38,7 +38,9 @@ function App() {
     offlineReady,
     isInstalled,
     hasServiceWorker,
+    canInstall,
     handleUpdate,
+    installApp,
     dismissToast: dismissUpdateToast,
     dismissOfflineReady,
   } = usePWAUpdate();
@@ -185,23 +187,31 @@ function App() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-sm">
-                <span className="text-base-content/60">App Status:</span>
-                {pwaStatus === "installed" ? (
-                  <span className="flex items-center gap-1 text-green-500">
-                    <CheckCircle size={14} />
-                    Installed
-                  </span>
-                ) : pwaStatus === "ready" ? (
-                  <span className="flex items-center gap-1 text-blue-400">
-                    <Wifi size={14} />
-                    Ready to Install
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-gray-500">
-                    <WifiOff size={14} />
-                    Running in Browser
-                  </span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-base-content/60">App Status:</span>
+                  {pwaStatus === "installed" ? (
+                    <span className="flex items-center gap-1 text-success">
+                      <CheckCircle size={14} />
+                      Installed
+                    </span>
+                  ) : pwaStatus === "ready" ? (
+                    <span className="flex items-center gap-1 text-info">
+                      <Wifi size={14} />
+                      Ready to Install
+                    </span>
+                  ) : (
+                    <span className="flex items-center gap-1 text-warning">
+                      <WifiOff size={14} />
+                      Running in Browser
+                    </span>
+                  )}
+                </div>
+                {canInstall && (
+                  <button onClick={installApp} className="btn btn-sm btn-info">
+                    <Download size={14} />
+                    Install App
+                  </button>
                 )}
               </div>
 
