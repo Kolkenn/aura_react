@@ -115,7 +115,8 @@ export interface ImportResult {
  */
 export interface UsePWAUpdateReturn {
   offlineReady: boolean; // True if the app is ready to be installed
-  needRefresh: boolean; // True if the app needs to be refreshed
+  needRefresh: boolean; // True if the app needs to be refreshed (controls toast visibility)
+  updateAvailable: boolean; // True if an update is available (persists after toast dismissal)
   isInstalled: boolean; // True if the app is installed
   hasServiceWorker: boolean; // True if the app has a service worker
   handleUpdate: () => void; // Updates the app

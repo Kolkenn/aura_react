@@ -2,7 +2,7 @@
 
 A local-first, privacy-focused cycle tracking Progressive Web App (PWA).
 
-![Version](https://img.shields.io/badge/version-1.0.7-green)
+![Version](https://img.shields.io/badge/version-1.0.8-green)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Features

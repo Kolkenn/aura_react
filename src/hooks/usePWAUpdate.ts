@@ -15,6 +15,7 @@ const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000; // Check every hour
 export function usePWAUpdate(): UsePWAUpdateReturn {
   const [offlineReady, setOfflineReady] = useState(false);
   const [needRefresh, setNeedRefresh] = useState(false);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [hasServiceWorker, setHasServiceWorker] = useState(false);
   const registrationRef = useRef<ServiceWorkerRegistration | null>(null);
@@ -70,6 +71,7 @@ export function usePWAUpdate(): UsePWAUpdateReturn {
             ) {
               // New content is available
               setNeedRefresh(true);
+              setUpdateAvailable(true);
             }
           });
         }
@@ -133,6 +135,7 @@ export function usePWAUpdate(): UsePWAUpdateReturn {
   return {
     offlineReady,
     needRefresh,
+    updateAvailable,
     isInstalled,
     hasServiceWorker,
     handleUpdate,

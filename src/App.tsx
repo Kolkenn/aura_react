@@ -24,7 +24,7 @@ import { ConfigForm, DataManagement } from "./features/settings";
 import LogEntryModal from "./components/LogEntryModal";
 
 // App Version
-const APP_VERSION = "1.0.7";
+const APP_VERSION = "1.0.8";
 
 function App() {
   const [activeView, setActiveView] = useState<ViewType>("calendar");
@@ -34,6 +34,7 @@ function App() {
   // PWA update detection
   const {
     needRefresh,
+    updateAvailable,
     offlineReady,
     isInstalled,
     hasServiceWorker,
@@ -209,7 +210,7 @@ function App() {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm">
                     <span className="text-base-content/60">Updates:</span>
-                    {needRefresh ? (
+                    {updateAvailable ? (
                       <span className="flex items-center gap-1 text-warning">
                         Update available
                       </span>
@@ -220,7 +221,7 @@ function App() {
                       </span>
                     )}
                   </div>
-                  {needRefresh && (
+                  {updateAvailable && (
                     <button
                       onClick={handleUpdate}
                       className="btn btn-sm btn-primary"
